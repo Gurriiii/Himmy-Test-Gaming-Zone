@@ -1,0 +1,2234 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Brain Zone — Gaming Zone</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#030712;--sur:rgba(255,255,255,0.04);--sur2:rgba(255,255,255,0.07);
+  --bdr:rgba(255,255,255,0.08);--bdr2:rgba(255,255,255,0.15);
+  --txt:#f1f5f9;--mut:#94a3b8;--hint:#475569;
+  --grn:#10b981;--red:#ef4444;--blue:#3b82f6;--amb:#f59e0b;--pur:#8b5cf6;
+  --gold:linear-gradient(135deg,#f6d365,#fda085);
+  --gs:#f6d365;--ge:#fda085;
+  --acc:#3b82f6;
+  --font:'Sora',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--txt);font-size:13px;min-height:100vh;position:relative}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(59,130,246,.07),transparent),radial-gradient(ellipse 40% 40% at 80% 80%,rgba(139,92,246,.05),transparent);pointer-events:none}
+.gold-text{background:var(--gold);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+
+/* NAV */
+.nav{height:56px;background:rgba(3,7,18,.94);border-bottom:1px solid var(--bdr);display:flex;align-items:center;padding:0 24px;gap:12px;position:sticky;top:0;z-index:200;backdrop-filter:blur(20px)}
+.nav-logo{width:28px;height:28px;border-radius:7px;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#000}
+.nav-brand{font-size:14px;font-weight:700}
+.nav-sp{flex:1}
+.live-pill{display:flex;align-items:center;gap:5px;padding:4px 10px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);border-radius:20px;font-size:10px;font-weight:600;color:var(--grn)}
+.lpd{width:6px;height:6px;border-radius:50%;background:var(--grn);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(16,185,129,.4)}50%{opacity:.6;box-shadow:0 0 0 4px transparent}}
+.streak{display:flex;align-items:center;gap:5px;padding:4px 10px;background:rgba(246,211,101,.1);border:1px solid rgba(246,211,101,.2);border-radius:20px;font-size:10px;font-weight:700;color:var(--gs)}
+.nav-av{width:28px;height:28px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#000}
+
+
+/* TICKER */
+.ticker{background:#000;border-bottom:1px solid var(--bdr);padding:6px 0;overflow:hidden;position:relative}
+.ticker-inner{display:flex;gap:48px;animation:scroll 30s linear infinite;white-space:nowrap}
+.ticker-inner:hover{animation-play-state:paused}
+@keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.tick-item{font-size:10px;font-family:var(--mono);color:var(--gs);flex-shrink:0}
+.tick-item b{color:var(--grn)}
+
+
+/* MAIN */
+.main{max-width:1100px;margin:0 auto;padding:24px 20px;position:relative;z-index:1}
+
+
+/* SCREEN MANAGER */
+.screen{display:none}.screen.active{display:block}
+
+
+/* CATEGORY SELECT */
+.cat-intro{text-align:center;padding:20px 0 28px}
+.cat-title{font-size:28px;font-weight:800;margin-bottom:6px}
+.cat-sub{font-size:13px;color:var(--mut)}
+.cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px}
+.cat-card{background:var(--sur2);border:1.5px solid var(--bdr);border-radius:20px;padding:24px 16px;text-align:center;cursor:pointer;transition:all .22s;position:relative;overflow:hidden}
+.cat-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .22s}
+.cat-card:hover{transform:translateY(-4px)}
+.cat-card:hover::before{opacity:1}
+.cat-card.defence::before{background:radial-gradient(circle at 50% 0%,rgba(239,68,68,.15),transparent)}
+.cat-card.ssc::before{background:radial-gradient(circle at 50% 0%,rgba(245,158,11,.15),transparent)}
+.cat-card.upsc::before{background:radial-gradient(circle at 50% 0%,rgba(139,92,246,.15),transparent)}
+.cat-card.banking::before{background:radial-gradient(circle at 50% 0%,rgba(16,185,129,.15),transparent)}
+.cat-card.railway::before{background:radial-gradient(circle at 50% 0%,rgba(59,130,246,.15),transparent)}
+.cat-card.nta::before{background:radial-gradient(circle at 50% 0%,rgba(236,72,153,.15),transparent)}
+.cat-ico-wrap{width:68px;height:68px;border-radius:50%;margin:0 auto 13px;display:flex;align-items:center;justify-content:center;font-size:32px;transition:transform .22s}
+.cat-card:hover .cat-ico-wrap{transform:scale(1.1)}
+.cat-nm{font-size:15px;font-weight:800;margin-bottom:4px}
+.cat-desc{font-size:10px;color:var(--mut);line-height:1.5}
+.cat-badge{margin-top:8px;font-size:9px;padding:3px 10px;border-radius:20px;display:inline-block;font-family:var(--mono);font-weight:600}
+
+
+/* EXAM SELECT */
+.back-btn{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--mut);cursor:pointer;margin-bottom:20px;background:var(--sur);border:1px solid var(--bdr);border-radius:9px;padding:7px 13px;width:fit-content;transition:all .13s}
+.back-btn:hover{color:var(--txt);border-color:var(--bdr2)}
+.section-title{font-size:18px;font-weight:800;margin-bottom:5px}
+.section-sub{font-size:11px;color:var(--mut);margin-bottom:20px}
+.exam-list{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
+.exam-item{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--sur2);border:1px solid var(--bdr);border-radius:13px;cursor:pointer;transition:all .15s}
+.exam-item:hover{border-color:var(--bdr2);background:rgba(255,255,255,.07)}
+.ei-left{display:flex;align-items:center;gap:12px}
+.ei-ico{font-size:20px}
+.ei-name{font-size:13px;font-weight:700}
+.ei-desc{font-size:10px;color:var(--mut);margin-top:2px}
+.ei-arrow{color:var(--mut);font-size:14px;transition:transform .13s}
+.exam-item:hover .ei-arrow{transform:translateX(4px);color:var(--txt)}
+
+
+/* GAME MODE SELECT */
+.modes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.mode-card{background:var(--sur2);border:1.5px solid var(--bdr);border-radius:16px;padding:20px;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.mode-card:hover{transform:translateY(-3px);border-color:var(--bdr2)}
+.mode-ico{font-size:28px;margin-bottom:10px}
+.mode-nm{font-size:13px;font-weight:800;margin-bottom:4px}
+.mode-desc{font-size:10px;color:var(--mut);line-height:1.5}
+.mode-pill{font-size:9px;margin-top:9px;padding:3px 10px;border-radius:20px;font-family:var(--mono);font-weight:700;display:inline-block}
+.mode-card.hot{border-color:rgba(239,68,68,.3)}.mode-card.hot::before{content:'🔥 HOT';position:absolute;top:8px;right:8px;font-size:8px;font-weight:700;background:rgba(239,68,68,.2);color:var(--red);padding:2px 7px;border-radius:10px;border:1px solid rgba(239,68,68,.3)}
+
+
+/* ===================== */
+/* QUIZ BLITZ MODE       */
+/* ===================== */
+.quiz-wrap{max-width:700px;margin:0 auto}
+.qb-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px}
+.qb-info{font-size:12px;color:var(--mut)}
+.qb-stats-row{display:flex;gap:10px;align-items:center}
+.qb-stat{background:var(--sur2);border:1px solid var(--bdr);border-radius:9px;padding:7px 14px;text-align:center}
+.qb-sv{font-size:15px;font-weight:800}
+.qb-sl{font-size:9px;color:var(--mut)}
+/* SVG Timer Ring */
+.timer-ring-wrap{position:relative;width:64px;height:64px;flex-shrink:0}
+.timer-ring-wrap svg{transform:rotate(-90deg)}
+.timer-ring-bg{fill:none;stroke:rgba(255,255,255,.08);stroke-width:4}
+.timer-ring-fill{fill:none;stroke:var(--grn);stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset .3s linear,stroke .3s}
+.timer-ring-txt{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;font-family:var(--mono)}
+.qb-card{background:var(--sur);border:1px solid var(--bdr);border-radius:20px;padding:28px;margin-bottom:16px}
+.qb-topic{font-size:10px;font-weight:700;color:var(--gs);text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px;font-family:var(--mono)}
+.qb-q{font-size:18px;font-weight:600;line-height:1.65;margin-bottom:22px}
+.qb-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.qb-opt{padding:15px 18px;background:var(--sur2);border:1.5px solid var(--bdr);border-radius:13px;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;text-align:left;color:var(--txt);font-family:var(--font)}
+.qb-opt:hover{background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.4)}
+.qb-opt.correct{background:rgba(16,185,129,.15);border-color:var(--grn);color:var(--grn)}
+.qb-opt.wrong{background:rgba(239,68,68,.1);border-color:var(--red);color:var(--red)}
+.streak-bar{display:flex;align-items:center;justify-content:center;gap:8px;font-size:12px;font-weight:700;padding:8px 16px;background:rgba(246,211,101,.07);border:1px solid rgba(246,211,101,.15);border-radius:10px;margin-bottom:14px}
+
+
+/* ===================== */
+/* BATTLE MODE           */
+/* ===================== */
+.battle-wrap{width:100%}
+.battle-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;gap:16px}
+.player-card{flex:1;text-align:center}
+.p-avatar{width:80px;height:80px;border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:36px;position:relative}
+.p-avatar.you{background:rgba(59,130,246,.15);border:3px solid var(--blue);box-shadow:0 0 24px rgba(59,130,246,.3)}
+.p-avatar.bot{background:rgba(239,68,68,.15);border:3px solid var(--red);box-shadow:0 0 24px rgba(239,68,68,.3)}
+.p-name{font-size:14px;font-weight:700;margin-bottom:5px}
+.p-rank{font-size:10px;color:var(--mut);font-family:var(--mono);margin-bottom:8px}
+.hp-wrap{display:flex;align-items:center;gap:7px}
+.hp-bar{flex:1;height:10px;background:rgba(255,255,255,.08);border-radius:5px;overflow:hidden}
+.hp-fill{height:100%;border-radius:5px;transition:width .6s ease;background:var(--grn)}
+.hp-fill.low{background:var(--red)}
+.hp-txt{font-size:10px;font-family:var(--mono);font-weight:700;min-width:35px}
+.vs-badge{font-size:44px;font-weight:900;background:var(--gold);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-style:italic;text-shadow:none}
+.battle-q-card{background:var(--sur);border:1px solid var(--bdr);border-radius:22px;padding:30px;margin-bottom:16px}
+.bq-meta{font-size:10px;font-weight:700;color:var(--gs);text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px;font-family:var(--mono)}
+.bq-text{font-size:20px;font-weight:600;line-height:1.6;margin-bottom:22px}
+.battle-opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.b-opt{padding:18px;background:var(--sur2);border:1.5px solid var(--bdr);color:var(--txt);border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;font-family:var(--font)}
+.b-opt:hover{background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.4);transform:scale(1.02)}
+.b-opt.correct{background:rgba(16,185,129,.15);border-color:var(--grn);color:var(--grn)}
+.b-opt.wrong{background:rgba(239,68,68,.1);border-color:var(--red);color:var(--red)}
+.battle-timer-bar{height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-bottom:16px}
+.bt-fill{height:100%;background:linear-gradient(90deg,var(--grn),var(--amb));border-radius:3px;transition:width .3s linear}
+.battle-fx{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:48px;opacity:0;transition:all .3s;z-index:900;pointer-events:none}
+
+
+/* CHARACTER POPUP */
+.char-popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:700;display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+.char-popup-overlay.open{display:flex}
+.char-popup{border-radius:28px;overflow:hidden;width:480px;max-height:88vh;overflow-y:auto;position:relative;box-shadow:0 40px 100px rgba(0,0,0,.6)}
+.cp-banner{padding:28px 24px;text-align:center;position:relative}
+.cp-banner::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,.35);pointer-events:none}
+.cp-inner{position:relative;z-index:1}
+.cp-cat{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.15em;opacity:.7;margin-bottom:8px;font-family:var(--mono)}
+.cp-name{font-size:26px;font-weight:800;margin-bottom:4px}
+.cp-desc{font-size:12px;opacity:.7}
+.cp-chars-row{display:flex;justify-content:center;gap:8px;margin:20px 0;flex-wrap:wrap}
+.cp-char{width:72px;height:72px;border-radius:50%;border:2.5px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:34px;cursor:pointer;transition:all .22s;flex-shrink:0;position:relative;background:rgba(255,255,255,.06)}
+.cp-char:hover{border-color:rgba(255,255,255,.8);transform:scale(1.08)}
+.cp-char.sel{border-color:#fff;box-shadow:0 0 20px rgba(255,255,255,.4);transform:scale(1.1)}
+.cp-char-name{font-size:9px;text-align:center;margin-top:22px;position:absolute;bottom:-22px;left:50%;transform:translateX(-50%);white-space:nowrap;color:rgba(255,255,255,.6);font-weight:600}
+@keyframes float0{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes float1{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes float2{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes float3{0%,100%{transform:translateY(0)}50%{transform:translateY(-11px)}}
+.float0{animation:float0 2.8s ease-in-out infinite}
+.float1{animation:float1 3.2s ease-in-out infinite .4s}
+.float2{animation:float2 2.6s ease-in-out infinite .8s}
+.float3{animation:float3 3s ease-in-out infinite .2s}
+.cp-body{padding:24px;background:#0d1628}
+.cp-quote{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:13px;padding:16px;margin-bottom:18px;font-size:14px;line-height:1.7;font-weight:500}
+.cp-quote-icon{font-size:18px;margin-bottom:6px}
+.cp-selected-name{font-size:13px;font-weight:700;margin-bottom:3px}
+.cp-selected-role{font-size:11px;color:var(--mut)}
+.cp-continue{width:100%;padding:14px;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;border:none;font-family:var(--font);transition:all .2s;margin-top:14px}
+
+
+/* LEADERBOARD */
+.lb-header{text-align:center;margin-bottom:20px;padding:20px;background:rgba(246,211,101,.05);border:1px solid rgba(246,211,101,.15);border-radius:16px}
+.lb-row{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--sur2);border:1px solid var(--bdr);border-radius:12px;margin-bottom:8px;transition:all .13s}
+.lb-row:hover{border-color:var(--bdr2)}
+.lb-rank{font-size:14px;font-weight:800;width:28px;text-align:center;font-family:var(--mono)}
+.lb-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.lb-name{flex:1;font-size:12px;font-weight:700}
+.lb-meta{font-size:10px;color:var(--mut)}
+.lb-score{font-size:14px;font-weight:800;font-family:var(--mono)}
+.lb-row.top1{background:rgba(246,211,101,.08);border-color:rgba(246,211,101,.3)}
+.lb-row.top2{background:rgba(192,192,192,.06);border-color:rgba(192,192,192,.2)}
+.lb-row.top3{background:rgba(205,127,50,.06);border-color:rgba(205,127,50,.2)}
+.lb-row.mine{background:rgba(59,130,246,.08);border-color:rgba(59,130,246,.3)}
+
+
+/* BADGE */
+.badge{font-size:9px;font-family:var(--mono);padding:2px 8px;border-radius:7px;font-weight:600}
+.b-grn{background:rgba(16,185,129,.15);color:var(--grn);border:1px solid rgba(16,185,129,.28)}
+.b-blue{background:rgba(59,130,246,.13);color:var(--blue);border:1px solid rgba(59,130,246,.28)}
+.b-gold{background:rgba(246,211,101,.13);color:var(--gs);border:1px solid rgba(246,211,101,.28)}
+.b-red{background:rgba(239,68,68,.13);color:var(--red);border:1px solid rgba(239,68,68,.26)}
+.b-pur{background:rgba(139,92,246,.13);color:var(--pur);border:1px solid rgba(139,92,246,.26)}
+
+
+/* BTN */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:9px 18px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:var(--font);transition:all .14s}
+.btn-gold{background:var(--gold);color:#000}.btn-gold:hover{opacity:.9}
+.btn-sec{background:var(--sur);color:var(--txt);border:1px solid var(--bdr2)}.btn-sec:hover{background:var(--sur2)}
+.btn-pri{background:var(--acc);color:#fff}.btn-pri:hover{background:#2563eb}
+
+
+/* NOTIF */
+.notif{position:fixed;bottom:20px;right:20px;z-index:999;background:#0f1829;border:1px solid var(--bdr2);border-radius:11px;padding:11px 16px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px;transform:translateY(60px);opacity:0;transition:all .25s;box-shadow:0 16px 40px rgba(0,0,0,.6)}
+.notif.show{transform:translateY(0);opacity:1}
+.nd{width:7px;height:7px;border-radius:50%}
+
+
+/* SCROLL */
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
+
+
+/* =============================================
+   HOME: CUSTOM TEST BANNER (NEW)
+   ============================================= */
+.ct-banner{background:linear-gradient(135deg,rgba(139,92,246,.12),rgba(246,211,101,.07));border:1.5px solid rgba(139,92,246,.3);border-radius:22px;padding:20px 26px;margin-bottom:22px;display:flex;align-items:center;gap:18px;cursor:pointer;transition:all .22s;position:relative;overflow:hidden}
+.ct-banner::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 90% 50%,rgba(139,92,246,.08),transparent);pointer-events:none}
+.ct-banner:hover{border-color:rgba(139,92,246,.55);transform:translateY(-2px);box-shadow:0 12px 40px rgba(139,92,246,.12)}
+.ct-banner-ico{width:58px;height:58px;border-radius:15px;background:rgba(139,92,246,.18);border:1.5px solid rgba(139,92,246,.35);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+.ct-banner-body{flex:1}
+.ct-banner-title{font-size:16px;font-weight:800;margin-bottom:4px}
+.ct-banner-desc{font-size:11px;color:var(--mut);line-height:1.6}
+.ct-banner-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.ct-tag{font-size:9px;font-family:var(--mono);padding:2px 9px;border-radius:8px;font-weight:700}
+.ct-tag-pur{background:rgba(139,92,246,.15);color:var(--pur);border:1px solid rgba(139,92,246,.28)}
+.ct-tag-gold{background:rgba(246,211,101,.12);color:var(--gs);border:1px solid rgba(246,211,101,.25)}
+.ct-tag-grn{background:rgba(16,185,129,.12);color:var(--grn);border:1px solid rgba(16,185,129,.25)}
+.ct-banner-arrow{width:40px;height:40px;border-radius:50%;background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.3);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;transition:all .22s}
+.ct-banner:hover .ct-banner-arrow{background:rgba(139,92,246,.28);transform:translateX(3px)}
+/* highlight custom card in modes grid */
+.mode-card.custom-highlight{border-color:rgba(139,92,246,.4);background:rgba(139,92,246,.06)}
+.mode-card.custom-highlight::after{content:'SWOT ✦';position:absolute;top:8px;right:8px;font-size:8px;font-weight:700;background:rgba(139,92,246,.2);color:var(--pur);padding:2px 7px;border-radius:10px;border:1px solid rgba(139,92,246,.3)}
+/* =============================================
+   CUSTOM TEST BUILDER STYLES
+   ============================================= */
+.ct-step-wrap{display:flex;align-items:center;gap:0;padding:0 0 20px;overflow-x:auto}
+.ct-si{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:600;color:var(--hint);white-space:nowrap;cursor:pointer}
+.ct-si.active{color:var(--gs)}.ct-si.done{color:var(--grn)}
+.ct-si-num{width:22px;height:22px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;flex-shrink:0;font-family:var(--mono)}
+.ct-si.active .ct-si-num{background:rgba(246,211,101,.15);border-color:var(--gs)}.ct-si.done .ct-si-num{background:rgba(16,185,129,.15);border-color:var(--grn)}
+.ct-step-line{width:22px;height:1px;background:var(--bdr);flex-shrink:0;margin:0 4px}
+.ct-card{background:var(--sur);border:1px solid var(--bdr);border-radius:18px;overflow:hidden;margin-bottom:13px}
+.ct-ch{padding:12px 18px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between}
+.ct-ct{font-size:12px;font-weight:700;display:flex;align-items:center;gap:7px}
+.ct-cb2{padding:15px 18px}
+.ct-lbl{font-size:9px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.12em;margin-bottom:9px}
+.ct-pills{display:flex;flex-wrap:wrap;gap:7px}
+.ct-pill{padding:6px 13px;border-radius:20px;border:1px solid var(--bdr2);font-size:11px;font-weight:600;cursor:pointer;background:transparent;color:var(--mut);font-family:var(--font);transition:all .13s}
+.ct-pill:hover{border-color:var(--bdr3,rgba(255,255,255,.22));color:var(--txt)}.ct-pill.p-sel{background:rgba(246,211,101,.15);border-color:var(--gs);color:var(--gs)}
+.ct-cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.ct-cat-card{background:var(--sur2);border:1.5px solid var(--bdr);border-radius:18px;padding:18px 14px;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.ct-cat-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .2s;pointer-events:none}
+.ct-cat-card:hover{transform:translateY(-3px)}.ct-cat-card:hover::before,.ct-cat-card.ct-active::before{opacity:1}
+.cc-banking::before{background:radial-gradient(circle at 50% 0%,rgba(16,185,129,.2),transparent 70%)}.cc-banking.ct-active{border-color:rgba(16,185,129,.5)}
+.cc-railway::before{background:radial-gradient(circle at 50% 0%,rgba(59,130,246,.2),transparent 70%)}.cc-railway.ct-active{border-color:rgba(59,130,246,.5)}
+.cc-ssc::before{background:radial-gradient(circle at 50% 0%,rgba(245,158,11,.2),transparent 70%)}.cc-ssc.ct-active{border-color:rgba(245,158,11,.5)}
+.cc-upsc::before{background:radial-gradient(circle at 50% 0%,rgba(139,92,246,.2),transparent 70%)}.cc-upsc.ct-active{border-color:rgba(139,92,246,.5)}
+.cc-defence-ct::before{background:radial-gradient(circle at 50% 0%,rgba(239,68,68,.2),transparent 70%)}.cc-defence-ct.ct-active{border-color:rgba(239,68,68,.5)}
+.cc-nta-ct::before{background:radial-gradient(circle at 50% 0%,rgba(236,72,153,.2),transparent 70%)}.cc-nta-ct.ct-active{border-color:rgba(236,72,153,.5)}
+.ct-cat-ico{font-size:28px;margin-bottom:8px;display:block}.ct-cat-nm{font-size:13px;font-weight:800;margin-bottom:3px}.ct-cat-sub{font-size:9px;color:var(--mut)}
+.ct-topic-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.ct-topic{display:flex;align-items:center;gap:9px;padding:10px 13px;background:var(--sur);border:1px solid var(--bdr);border-radius:11px;cursor:pointer;transition:all .13s}
+.ct-topic:hover{border-color:var(--bdr2)}.ct-topic.ct-checked{border-color:rgba(246,211,101,.3);background:rgba(246,211,101,.05)}
+.ct-tpick{width:17px;height:17px;border-radius:5px;border:1.5px solid var(--bdr2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;transition:all .13s}
+.ct-topic.ct-checked .ct-tpick{background:var(--gold);border-color:transparent;color:#000}
+.ct-tnm{font-size:11px;font-weight:600;flex:1}.ct-tq{font-size:9px;font-family:var(--mono);color:var(--mut)}
+input[type=range]{width:100%;height:4px;border-radius:2px;outline:none;cursor:pointer;-webkit-appearance:none;background:linear-gradient(to right,#f6d365 0%,#f6d365 50%,rgba(255,255,255,.1) 50%)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,#f6d365,#fda085);cursor:pointer;box-shadow:0 2px 6px rgba(246,211,101,.3)}
+.ct-rng-wrap{margin-bottom:13px}.ct-rng-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
+.ct-rng-lbl{font-size:11px;color:var(--mut);font-weight:600}.ct-rng-val{font-size:14px;font-weight:800;font-family:var(--mono);background:var(--gold);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.ct-tgl-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bdr)}.ct-tgl-row:last-child{border-bottom:none}
+.ct-tgl-nm{font-size:12px;font-weight:600}.ct-tgl-desc{font-size:10px;color:var(--mut);margin-top:2px}
+.ct-tgl{position:relative;width:38px;height:21px;flex-shrink:0}.ct-tgl input{opacity:0;width:0;height:0;position:absolute}
+.ct-tgl-trk{position:absolute;inset:0;border-radius:21px;background:rgba(255,255,255,.1);cursor:pointer;transition:.2s;border:1px solid var(--bdr2)}
+.ct-tgl input:checked+.ct-tgl-trk{background:rgba(246,211,101,.25);border-color:var(--gs)}
+.ct-tgl-trk::before{content:'';position:absolute;width:15px;height:15px;left:2px;top:2px;border-radius:50%;background:var(--mut);transition:.2s}
+.ct-tgl input:checked+.ct-tgl-trk::before{transform:translateX(17px);background:var(--gs)}
+.ct-mk-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.ct-mk-card{background:var(--sur);border:1.5px solid var(--bdr);border-radius:13px;padding:13px;text-align:center;cursor:pointer;transition:all .13s}
+.ct-mk-card:hover{border-color:var(--bdr2)}.ct-mk-card.ct-mk-sel{border-color:var(--gs);background:rgba(246,211,101,.06)}
+.ct-mk-ico{font-size:20px;margin-bottom:5px}.ct-mk-scheme{font-size:11px;font-weight:800;font-family:var(--mono);margin-bottom:2px}.ct-mk-desc{font-size:9px;color:var(--mut)}
+.ct-ni{font-size:9px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;display:block}
+.ct-ninp{width:100%;background:rgba(0,0,0,.4);border:1px solid var(--bdr2);border-radius:10px;padding:9px 12px;font-size:13px;font-family:var(--mono);color:var(--txt);outline:none;transition:border-color .13s}
+.ct-ninp:focus{border-color:var(--gs)}
+.ct-sum-banner{padding:18px;background:linear-gradient(135deg,rgba(246,211,101,.08),rgba(253,160,133,.05));border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:12px}
+.ct-sum-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:13px 18px;border-bottom:1px solid var(--bdr)}
+.ct-ss{text-align:center;padding:9px;background:rgba(0,0,0,.2);border-radius:10px;border:1px solid var(--bdr)}
+.ct-ss-v{font-size:16px;font-weight:800;background:var(--gold);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.ct-ss-l{font-size:9px;color:var(--mut);margin-top:2px;text-transform:uppercase;letter-spacing:.06em}
+.ct-sum-rows{padding:11px 18px}.ct-sum-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px}.ct-sum-row:last-child{border-bottom:none}
+.ct-sum-key{color:var(--mut)}.ct-sum-val{font-weight:700}
+.ct-sum-badges{padding:0 18px 13px;display:flex;flex-wrap:wrap;gap:5px}
+.ct-btns{display:flex;gap:9px;margin-top:18px}
+.ct-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;border-radius:11px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:var(--font);transition:all .13s}
+.ct-btn-gold{background:var(--gold);color:#000}.ct-btn-gold:hover{opacity:.9}.ct-btn-sec{background:var(--sur);color:var(--txt);border:1px solid var(--bdr2)}.ct-btn-sec:hover{background:var(--sur2)}.ct-btn-full{flex:1}.ct-btn-lg{padding:13px 20px;font-size:13px;font-weight:800}
+/* TEST ENGINE */
+#ct-test-wrap{display:none;position:fixed;inset:0;z-index:500;background:var(--bg);flex-direction:column;overflow:hidden}
+#ct-test-wrap.open{display:flex}
+.ct-th{height:54px;background:rgba(3,7,18,.96);border-bottom:3px solid var(--gs);display:flex;align-items:center;padding:0 22px;gap:14px;flex-shrink:0}
+.ct-th-exam{font-size:13px;font-weight:700}.ct-th-sec{font-size:10px;color:var(--mut)}.ct-th-sp{flex:1}
+.ct-timer{font-size:20px;font-weight:800;font-family:var(--mono);color:var(--red);padding:4px 14px;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);border-radius:8px;min-width:84px;text-align:center}
+.ct-timer.warn{animation:twarn 1s infinite}
+@keyframes twarn{0%,100%{opacity:1}50%{opacity:.4}}
+.ct-th-sub{padding:6px 14px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid rgba(246,211,101,.25);font-family:var(--font);background:rgba(246,211,101,.15);color:var(--gs)}
+.ct-sec-tabs{background:rgba(3,7,18,.95);border-bottom:1px solid var(--bdr);display:flex;overflow-x:auto;padding:0 18px;flex-shrink:0}
+.ct-sec-tab{padding:9px 16px;font-size:11px;font-weight:700;cursor:pointer;border:none;background:none;font-family:var(--font);color:var(--mut);border-bottom:2px solid transparent;white-space:nowrap;transition:all .12s}
+.ct-sec-tab.active{color:var(--gs);border-bottom-color:var(--gs)}
+.ct-test-body{display:flex;flex:1;overflow:hidden}
+.ct-q-area{flex:1;overflow-y:auto;padding:24px 28px}
+.ct-qbrow{display:flex;align-items:center;gap:8px;margin-bottom:13px}
+.ct-qnbadge{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;background:rgba(246,211,101,.08);border:1px solid rgba(246,211,101,.2);border-radius:20px;font-size:11px;font-weight:700;color:var(--gs)}
+.ct-qtbadge{font-size:9px;font-family:var(--mono);padding:3px 9px;border-radius:8px;background:var(--sur2);border:1px solid var(--bdr);color:var(--mut)}
+.ct-qtext{font-size:17px;font-weight:500;line-height:1.75;color:var(--txt);margin-bottom:20px}
+.ct-opts{display:flex;flex-direction:column;gap:9px}
+.ct-opt{display:flex;align-items:center;gap:12px;padding:14px 16px;border:1.5px solid var(--bdr);border-radius:14px;cursor:pointer;transition:border-color .15s,background .15s,transform .1s;font-size:14px;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;min-height:52px;outline:none;color:var(--txt);width:100%;text-align:left;font-family:var(--font);background:var(--sur2)}
+.ct-opt *{pointer-events:none}
+.ct-opt:hover{border-color:rgba(59,130,246,.4);background:rgba(59,130,246,.08)}
+.ct-opt:active{transform:scale(0.97);background:rgba(59,130,246,.1)}
+.ct-opt.ct-sel{border-color:var(--grn);background:rgba(16,185,129,.1)}
+.ct-opt-r{width:17px;height:17px;border-radius:50%;border:2px solid var(--bdr2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .13s}
+.ct-opt.ct-sel .ct-opt-r{border-color:var(--grn);background:var(--grn)}.ct-opt.ct-sel .ct-opt-r::after{content:'';width:6px;height:6px;border-radius:50%;background:#fff}
+.ct-qmeta{display:flex;gap:14px;margin-top:16px;padding-top:14px;border-top:1px solid var(--bdr)}.ct-qmi{font-size:11px;color:var(--mut)}
+.ct-footer{height:50px;background:rgba(3,7,18,.95);border-top:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;padding:0 18px;flex-shrink:0}
+.ct-ftb{padding:7px 13px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .12s}
+.ct-ftb-rev{background:rgba(245,158,11,.1);color:var(--amb);border:1px solid rgba(245,158,11,.25)}.ct-ftb-clr{background:var(--sur);color:var(--mut);border:1px solid var(--bdr2)}.ct-ftb-save{background:rgba(16,185,129,.14);color:var(--grn);border:1px solid rgba(16,185,129,.28)}.ct-ftb-sub{background:var(--gold);color:#000;border:none}.ct-ftb-nav{background:var(--sur2);color:var(--txt);border:1px solid var(--bdr2)}
+.ct-palette{width:255px;flex-shrink:0;border-left:1px solid var(--bdr);overflow-y:auto;background:rgba(3,7,18,.98)}
+.ct-pal-hd{padding:12px 13px;border-bottom:1px solid var(--bdr);background:rgba(0,0,0,.2)}
+.ct-pal-av{width:33px;height:33px;border-radius:8px;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#000;margin-bottom:6px}
+.ct-pal-nm{font-size:11px;font-weight:700}.ct-pal-roll{font-size:9px;color:var(--mut);font-family:var(--mono)}
+.ct-pal-legend{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;padding:8px;background:rgba(255,255,255,.03);border-radius:8px;border:1px solid var(--bdr)}
+.ct-leg{display:flex;align-items:center;gap:4px;font-size:9px;color:var(--mut)}.ct-ldot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.ct-pal-sec{font-size:9px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.1em;padding:9px 12px 4px;border-top:1px solid var(--bdr)}
+.ct-qgrid{display:flex;flex-wrap:wrap;gap:5px;padding:7px 10px}
+.ct-qn{width:31px;height:29px;border-radius:5px 5px 10px 10px;border:1.5px solid rgba(255,255,255,.1);background:var(--sur);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;cursor:pointer;transition:all .12s;color:var(--mut)}
+.ct-qn:hover{transform:scale(1.08);border-color:rgba(59,130,246,.4)}.ct-qn.qna{background:var(--grn);color:#fff;border-color:var(--grn)}.ct-qn.qnr{background:var(--amb);color:#000;border-color:var(--amb)}.ct-qn.qnv{background:rgba(239,68,68,.18);border-color:rgba(239,68,68,.35);color:var(--red)}.ct-qn.qnc{border:2px solid var(--blue);box-shadow:0 0 0 2px rgba(59,130,246,.2);color:var(--txt)}
+/* RESULT + SWOT */
+#ct-result-wrap{display:none;position:fixed;inset:0;z-index:500;background:var(--bg);overflow-y:auto}
+#ct-result-wrap.open{display:block}
+.ct-ri{max-width:840px;margin:0 auto;padding:24px 20px}
+.ct-res-hero{background:linear-gradient(135deg,rgba(246,211,101,.1),rgba(253,160,133,.06));border:1px solid rgba(246,211,101,.2);border-radius:22px;padding:26px;text-align:center;margin-bottom:14px;position:relative;overflow:hidden}
+.ct-sring{width:104px;height:104px;border-radius:50%;border:4px solid rgba(246,211,101,.3);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 12px;background:rgba(246,211,101,.06)}
+.ct-snum{font-size:26px;font-weight:800;background:var(--gold);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+.ct-stot{font-size:11px;color:var(--mut)}.ct-grade{font-size:18px;font-weight:800;margin-bottom:3px}.ct-pct{font-size:11px;color:var(--mut)}
+.ct-res-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:13px}
+.ct-rs{background:var(--sur);border:1px solid var(--bdr);border-radius:13px;padding:12px;text-align:center}
+.ct-rsv{font-size:17px;font-weight:800}.ct-rsl{font-size:9px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em;margin-top:3px}
+.ct-sp-list{display:flex;flex-direction:column;gap:9px}
+.ct-sp-item{background:var(--sur);border:1px solid var(--bdr);border-radius:12px;padding:12px 14px}
+.ct-sp-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}.ct-sp-nm{font-size:12px;font-weight:700}.ct-sp-sc{font-size:12px;font-weight:800;font-family:var(--mono)}
+.ct-sp-bar{height:5px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden}.ct-sp-fill{height:100%;border-radius:3px;transition:width .8s ease}
+.ct-sp-meta{display:flex;gap:11px;margin-top:6px;flex-wrap:wrap}.ct-sp-mi{font-size:10px;color:var(--mut)}
+.ct-ta-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.ct-ta{background:var(--sur);border:1px solid var(--bdr);border-radius:12px;padding:12px}
+.ct-ta-t{font-size:10px;font-weight:700;margin-bottom:3px}.ct-ta-v{font-size:17px;font-weight:800;margin-bottom:1px}.ct-ta-l{font-size:9px;color:var(--mut)}
+.ct-ta-bar{height:4px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden;margin-top:6px}.ct-ta-fill{height:100%;border-radius:2px}
+.ct-swot-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.ct-swot{border-radius:18px;padding:17px}
+.sw-s{background:rgba(16,185,129,.07);border:1.5px solid rgba(16,185,129,.25)}.sw-w{background:rgba(239,68,68,.07);border:1.5px solid rgba(239,68,68,.25)}.sw-o{background:rgba(59,130,246,.07);border:1.5px solid rgba(59,130,246,.25)}.sw-t{background:rgba(245,158,11,.07);border:1.5px solid rgba(245,158,11,.25)}
+.ct-swot-hd{display:flex;align-items:center;gap:8px;margin-bottom:11px}.ct-swot-title{font-size:13px;font-weight:800}
+.sw-s .ct-swot-title{color:var(--grn)}.sw-w .ct-swot-title{color:var(--red)}.sw-o .ct-swot-title{color:var(--blue)}.sw-t .ct-swot-title{color:var(--amb)}
+.ct-swot-items{display:flex;flex-direction:column;gap:6px}.ct-swot-item{display:flex;gap:7px;font-size:11px;line-height:1.5;align-items:flex-start}
+.ct-swot-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.sw-s .ct-swot-dot{background:var(--grn)}.sw-w .ct-swot-dot{background:var(--red)}.sw-o .ct-swot-dot{background:var(--blue)}.sw-t .ct-swot-dot{background:var(--amb)}
+.ct-ai-card{background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.2);border-radius:16px;padding:15px;margin-bottom:12px}
+.ct-ai-hd{display:flex;align-items:center;gap:7px;margin-bottom:8px}.ct-ai-txt{font-size:12px;line-height:1.75;color:var(--mut)}.ct-ai-txt b{color:var(--txt)}
+.ct-plan-list{display:flex;flex-direction:column;gap:0}
+.ct-plan-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--bdr)}.ct-plan-item:last-child{border-bottom:none}
+.ct-plan-left{display:flex;flex-direction:column;align-items:center;width:38px;flex-shrink:0}
+.ct-plan-day{width:33px;height:33px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;font-family:var(--mono);border:1.5px solid}
+.ct-plan-line{flex:1;width:1px;background:var(--bdr);min-height:12px}
+.ct-plan-lbl{font-size:12px;font-weight:700;margin-bottom:2px}.ct-plan-desc{font-size:11px;color:var(--mut);line-height:1.5}
+.ct-plan-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
+.ct-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:600;display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+.ct-overlay.open{display:flex}
+.ct-modal{background:#0a1020;border:1px solid var(--bdr2);border-radius:22px;padding:24px;width:400px;box-shadow:0 40px 100px rgba(0,0,0,.6)}
+.ct-mhd{text-align:center;margin-bottom:16px}.ct-mico{font-size:34px;margin-bottom:8px}.ct-mtitle{font-size:15px;font-weight:800;margin-bottom:3px}.ct-msub{font-size:11px;color:var(--mut)}
+.ct-mstats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:13px 0}
+.ct-mstat{text-align:center;padding:10px;border-radius:10px;border:1px solid var(--bdr)}.ct-msv{font-size:16px;font-weight:800}.ct-msl{font-size:9px;color:var(--mut);margin-top:2px;text-transform:uppercase}
+.ct-mbtns{display:flex;gap:8px;margin-top:11px}
+
+
+
+
+/* =============================================
+   MOBILE RESPONSIVE (≤768px)
+   ============================================= */
+@media(max-width:768px){
+  body{font-size:14px}
+  .main{padding:14px 12px}
+  .nav{padding:0 14px;gap:8px;height:52px}
+  .nav-brand{font-size:13px}
+  .streak,.live-pill{font-size:9px;padding:3px 8px}
+  .cat-title{font-size:22px}
+  .cat-grid{grid-template-columns:1fr 1fr;gap:11px}
+  .cat-card{padding:18px 10px;border-radius:16px}
+  .cat-ico-wrap{width:52px;height:52px;font-size:24px}
+  .cat-nm{font-size:13px}
+  .cat-desc{font-size:9px}
+  .modes-grid{grid-template-columns:1fr 1fr;gap:10px}
+  .mode-card{padding:16px 12px}
+  .mode-ico{font-size:22px;margin-bottom:7px}
+  .mode-nm{font-size:12px}
+  .mode-desc{font-size:9px}
+  .ct-banner{padding:14px 16px;gap:12px;border-radius:16px;margin-bottom:16px}
+  .ct-banner-ico{width:48px;height:48px;font-size:22px;border-radius:12px}
+  .ct-banner-title{font-size:14px}
+  .ct-banner-desc{font-size:10px}
+  .ct-banner-tags{gap:4px}
+  .ct-tag{font-size:8px;padding:2px 7px}
+  .ct-banner-arrow{width:34px;height:34px;font-size:14px}
+  .ct-cat-grid{grid-template-columns:1fr 1fr;gap:10px}
+  .ct-cat-card{padding:14px 10px;border-radius:14px}
+  .ct-cat-ico{font-size:24px;margin-bottom:6px}
+  .ct-cat-nm{font-size:12px}
+  .ct-topic-grid{grid-template-columns:1fr}
+  .ct-mk-grid{grid-template-columns:1fr 1fr}
+  .ct-sum-stats{grid-template-columns:1fr 1fr}
+  .ct-step-wrap{gap:0;padding-bottom:16px}
+  .ct-si{font-size:9px;gap:4px}
+  .ct-si-num{width:18px;height:18px;font-size:8px}
+  .ct-step-line{width:12px}
+  /* TEST ENGINE mobile */
+  .ct-th{padding:0 12px;gap:8px;height:50px}
+  .ct-th-exam{font-size:11px}
+  .ct-th-sec{font-size:9px}
+  .ct-timer{font-size:15px;padding:3px 10px;min-width:70px}
+  .ct-th-sub{padding:5px 10px;font-size:10px}
+  .ct-sec-tabs{padding:0 10px}
+  .ct-sec-tab{padding:8px 12px;font-size:10px}
+  .ct-test-body{flex-direction:column}
+  .ct-palette{width:100%;border-left:none;border-top:1px solid var(--bdr);max-height:160px;order:2}
+  .ct-q-area{padding:16px 14px;order:1}
+  .ct-qtext{font-size:15px;line-height:1.65;margin-bottom:16px}
+  .ct-opt{padding:13px 14px;font-size:13px;border-radius:12px;min-height:50px}
+  .ct-qgrid{padding:6px 10px;gap:4px}
+  .ct-qn{width:28px;height:26px;font-size:9px}
+  .ct-footer{height:auto;padding:8px 10px;flex-wrap:wrap;gap:6px}
+  .ct-ftb{padding:9px 12px;font-size:11px;flex:1;text-align:center}
+  /* RESULT mobile */
+  .ct-ri{padding:14px 12px}
+  .ct-res-stats{grid-template-columns:1fr 1fr}
+  .ct-swot-grid{grid-template-columns:1fr}
+  .ct-ta-grid{grid-template-columns:1fr 1fr}
+  /* REVIEW mobile */
+  .ct-rev-card{padding:16px 14px}
+  .ct-rev-opts{grid-template-columns:1fr}
+  /* Leaderboard */
+  .lb-row{gap:8px;padding:10px 12px}
+  .quiz-wrap{padding:0}
+  .qb-opts{grid-template-columns:1fr}
+  .battle-opts{grid-template-columns:1fr}
+  .battle-header{gap:8px}
+  .p-avatar{width:60px;height:60px;font-size:26px}
+  .section-title{font-size:16px}
+  .modes-grid{grid-template-columns:1fr}
+}
+@media(max-width:400px){
+  .cat-grid{grid-template-columns:1fr 1fr}
+  .cat-card{padding:14px 8px}
+  .modes-grid{grid-template-columns:1fr}
+}
+
+
+/* =============================================
+   QUESTION REVIEW SCREEN (after submit)
+   ============================================= */
+#ct-review-wrap{display:none;position:fixed;inset:0;z-index:510;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch}
+#ct-review-wrap.open{display:block}
+.ct-rev-inner{max-width:760px;margin:0 auto;padding:18px 16px}
+.ct-rev-header{background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.2);border-radius:18px;padding:18px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.ct-rev-nav{display:flex;align-items:center;gap:10px}
+.ct-rev-num{font-size:13px;font-weight:800;font-family:var(--mono);background:var(--gold);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.ct-rev-card{background:var(--sur);border:1.5px solid var(--bdr);border-radius:18px;padding:20px;margin-bottom:14px}
+.ct-rev-card.correct-card{border-color:rgba(16,185,129,.35);background:rgba(16,185,129,.04)}
+.ct-rev-card.wrong-card{border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.04)}
+.ct-rev-card.skip-card{border-color:rgba(148,163,184,.25);background:rgba(148,163,184,.03)}
+.ct-rev-tag{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:11px;font-family:var(--mono)}
+.ct-rev-tag-c{background:rgba(16,185,129,.15);color:var(--grn);border:1px solid rgba(16,185,129,.3)}
+.ct-rev-tag-w{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.ct-rev-tag-s{background:rgba(148,163,184,.1);color:var(--mut);border:1px solid rgba(148,163,184,.2)}
+.ct-rev-qtext{font-size:15px;font-weight:500;line-height:1.7;margin-bottom:16px;color:var(--txt)}
+.ct-rev-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ct-rev-opt{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:12px;border:1.5px solid var(--bdr);font-size:13px;background:var(--sur2)}
+.ct-rev-opt.opt-correct{border-color:var(--grn);background:rgba(16,185,129,.12);color:var(--grn);font-weight:700}
+.ct-rev-opt.opt-wrong-sel{border-color:var(--red);background:rgba(239,68,68,.1);color:var(--red);font-weight:700}
+.ct-rev-opt.opt-unsel{opacity:.55}
+.ct-rev-opt-icon{font-size:14px;flex-shrink:0}
+.ct-rev-explanation{margin-top:14px;padding:13px;background:rgba(139,92,246,.07);border:1px solid rgba(139,92,246,.2);border-radius:12px}
+.ct-rev-exp-title{font-size:10px;font-weight:700;color:var(--pur);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
+.ct-rev-exp-text{font-size:12px;color:var(--mut);line-height:1.65}
+.ct-rev-progress{height:4px;background:rgba(255,255,255,.07);border-radius:2px;margin-bottom:18px;overflow:hidden}
+.ct-rev-progress-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,#f6d365,#fda085);transition:width .3s ease}
+.ct-rev-jump-grid{display:flex;flex-wrap:wrap;gap:5px;padding:12px}
+.ct-rev-jq{width:34px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid;transition:transform .12s;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.ct-rev-jq:hover,.ct-rev-jq:active{transform:scale(1.1)}
+.ct-rev-jq.rjc{background:rgba(16,185,129,.2);border-color:var(--grn);color:var(--grn)}
+.ct-rev-jq.rjw{background:rgba(239,68,68,.15);border-color:var(--red);color:var(--red)}
+.ct-rev-jq.rjs{background:rgba(148,163,184,.08);border-color:rgba(148,163,184,.25);color:var(--mut)}
+.ct-rev-jq.rjcur{box-shadow:0 0 0 2px var(--blue);transform:scale(1.08)}
+.ct-rev-sticky{position:sticky;bottom:0;background:rgba(3,7,18,.96);border-top:1px solid var(--bdr);padding:10px 16px;display:flex;gap:8px;align-items:center;backdrop-filter:blur(10px)}
+
+
+</style>
+</head>
+<body>
+
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">BZ</div>
+  <span class="nav-brand">Brain Zone <span class="gold-text">Gaming Zone</span></span>
+  <div class="nav-sp"></div>
+  <div class="live-pill"><span class="lpd"></span>4,281 Live</div>
+  <div class="streak">🔥 5-Streak &nbsp;×1.5 XP</div>
+  <div class="nav-av">RS</div>
+</nav>
+
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner" id="ticker">
+    <span class="tick-item">🚀 <b>AMIT (Rank #1)</b> is on a 20-streak! 🏆</span>
+    <span class="tick-item">⚡ LIVE ASPIRANTS: <b>4,281</b></span>
+    <span class="tick-item">🎯 WIN STREAK: <b>1.5x XP MULTIPLIER</b></span>
+    <span class="tick-item">🌟 PRIYA just crossed <b>Rank #100</b> in SSC CGL!</span>
+    <span class="tick-item">🔥 Today's top scorer: <b>RAHUL — 98/100</b></span>
+    <span class="tick-item">⚡ NEW: UPSC Prelims 2024 PYQs added — <b>200 questions!</b></span>
+    <span class="tick-item">🏆 Defence Mock Contest starts in <b>30 minutes</b> — Register now!</span>
+    <!-- Clone for seamless scroll -->
+    <span class="tick-item">🚀 <b>AMIT (Rank #1)</b> is on a 20-streak! 🏆</span>
+    <span class="tick-item">⚡ LIVE ASPIRANTS: <b>4,281</b></span>
+    <span class="tick-item">🎯 WIN STREAK: <b>1.5x XP MULTIPLIER</b></span>
+    <span class="tick-item">🌟 PRIYA just crossed <b>Rank #100</b> in SSC CGL!</span>
+    <span class="tick-item">🔥 Today's top scorer: <b>RAHUL — 98/100</b></span>
+  </div>
+</div>
+
+
+<div class="main">
+
+
+<!-- ===== SCREEN 1: CATEGORY SELECT ===== -->
+<div class="screen active" id="s-cats">
+  <div class="cat-intro">
+    <div class="cat-title">Choose Your <span class="gold-text">Category</span></div>
+    <div class="cat-sub">Select the exam category to start practicing — PYQs from last 15 years!</div>
+  </div>
+
+
+  <!-- ★ CUSTOM TEST BANNER — shortcut directly on home page ★ -->
+  <div class="ct-banner" onclick="openCTBuilder()">
+    <div class="ct-banner-ico">🎛️</div>
+    <div class="ct-banner-body">
+      <div class="ct-banner-title">Build Your <span class="gold-text">Custom Test</span></div>
+      <div class="ct-banner-desc">Set your own category, subjects, topics, no. of questions, time limit &amp; marking scheme. Get a full SWOT analysis + 7-day AI study plan after every attempt.</div>
+      <div class="ct-banner-tags">
+        <span class="ct-tag ct-tag-pur">6 Exam Categories</span>
+        <span class="ct-tag ct-tag-gold">Custom Marking</span>
+        <span class="ct-tag ct-tag-grn">SWOT Analysis</span>
+        <span class="ct-tag ct-tag-pur">AI Study Plan</span>
+        <span class="ct-tag ct-tag-gold">Bilingual</span>
+      </div>
+    </div>
+    <div class="ct-banner-arrow">→</div>
+  </div>
+
+
+  <div class="cat-grid">
+    <div class="cat-card defence" onclick="selectCat('defence')">
+      <div class="cat-ico-wrap" style="background:rgba(239,68,68,.15);border:2px solid rgba(239,68,68,.3)">🪖</div>
+      <div class="cat-nm">Defence</div>
+      <div class="cat-desc">NDA • CDS • AFCAT<br>MNS • Army GD</div>
+      <div class="cat-badge" style="background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.28)">48,000 PYQs</div>
+    </div>
+    <div class="cat-card ssc" onclick="selectCat('ssc')">
+      <div class="cat-ico-wrap" style="background:rgba(245,158,11,.15);border:2px solid rgba(245,158,11,.3)">📋</div>
+      <div class="cat-nm">SSC</div>
+      <div class="cat-desc">CGL • CHSL • MTS<br>GD Constable • CPO</div>
+      <div class="cat-badge" style="background:rgba(245,158,11,.15);color:var(--amb);border:1px solid rgba(245,158,11,.28)">2,40,000 PYQs</div>
+    </div>
+    <div class="cat-card upsc" onclick="selectCat('upsc')">
+      <div class="cat-ico-wrap" style="background:rgba(139,92,246,.15);border:2px solid rgba(139,92,246,.3)">🎖️</div>
+      <div class="cat-nm">UPSC</div>
+      <div class="cat-desc">CSE Prelims • Mains<br>IFS • NDA</div>
+      <div class="cat-badge" style="background:rgba(139,92,246,.15);color:var(--pur);border:1px solid rgba(139,92,246,.28)">1,80,000 PYQs</div>
+    </div>
+    <div class="cat-card banking" onclick="selectCat('banking')">
+      <div class="cat-ico-wrap" style="background:rgba(16,185,129,.15);border:2px solid rgba(16,185,129,.3)">🏦</div>
+      <div class="cat-nm">Banking</div>
+      <div class="cat-desc">IBPS PO/Clerk • SBI PO<br>RBI Grade B</div>
+      <div class="cat-badge" style="background:rgba(16,185,129,.15);color:var(--grn);border:1px solid rgba(16,185,129,.28)">1,60,000 PYQs</div>
+    </div>
+    <div class="cat-card railway" onclick="selectCat('railway')">
+      <div class="cat-ico-wrap" style="background:rgba(59,130,246,.15);border:2px solid rgba(59,130,246,.3)">🚂</div>
+      <div class="cat-nm">Railway</div>
+      <div class="cat-desc">NTPC • ALP<br>JE • Group D</div>
+      <div class="cat-badge" style="background:rgba(59,130,246,.15);color:var(--blue);border:1px solid rgba(59,130,246,.28)">1,20,000 PYQs</div>
+    </div>
+    <div class="cat-card nta" onclick="selectCat('nta')">
+      <div class="cat-ico-wrap" style="background:rgba(236,72,153,.15);border:2px solid rgba(236,72,153,.3)">🎓</div>
+      <div class="cat-nm">NTA / Academic</div>
+      <div class="cat-desc">JEE • NEET<br>CUET • UGC NET</div>
+      <div class="cat-badge" style="background:rgba(236,72,153,.15);color:#ec4899;border:1px solid rgba(236,72,153,.28)">1,40,000 PYQs</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ===== SCREEN 2: EXAM SELECT ===== -->
+<div class="screen" id="s-exams">
+  <div class="back-btn" onclick="goBack('s-cats')">← Back to Categories</div>
+  <div class="section-title" id="exam-cat-title">Select Exam</div>
+  <div class="section-sub" id="exam-cat-sub">Choose your target exam</div>
+  <div class="exam-list" id="exam-list"></div>
+</div>
+
+
+<!-- ===== SCREEN 3: GAME MODE SELECT ===== -->
+<div class="screen" id="s-modes">
+  <div class="back-btn" onclick="goBack('s-exams')">← Back to Exams</div>
+  <div class="section-title" id="mode-exam-title">Choose Game Mode</div>
+  <div class="section-sub" style="margin-bottom:20px" id="mode-exam-sub">How do you want to practice today?</div>
+  <div class="modes-grid">
+    <div class="mode-card hot" onclick="startMode('blitz')">
+      <div class="mode-ico">⚡</div>
+      <div class="mode-nm">Quiz Blitz</div>
+      <div class="mode-desc">Fast-paced 15-sec per question challenge with streaks & XP multipliers</div>
+      <div class="mode-pill" style="background:rgba(246,211,101,.15);color:var(--gs);border:1px solid rgba(246,211,101,.28)">🔥 Most Popular</div>
+    </div>
+    <div class="mode-card" onclick="startMode('pyq')">
+      <div class="mode-ico">📚</div>
+      <div class="mode-nm">PYQ Marathon</div>
+      <div class="mode-desc">Full previous year paper practice with detailed solutions & analysis</div>
+      <div class="mode-pill" style="background:rgba(59,130,246,.13);color:var(--blue);border:1px solid rgba(59,130,246,.28)">15 Years PYQs</div>
+    </div>
+    <div class="mode-card" onclick="startMode('battle')">
+      <div class="mode-ico">⚔️</div>
+      <div class="mode-nm">Battle Mode</div>
+      <div class="mode-desc">1v1 live battle against Bot or real students — HP system, winner takes all</div>
+      <div class="mode-pill" style="background:rgba(239,68,68,.13);color:var(--red);border:1px solid rgba(239,68,68,.26)">Live PvP</div>
+    </div>
+    <div class="mode-card" onclick="startMode('daily')">
+      <div class="mode-ico">☀️</div>
+      <div class="mode-nm">Daily Spark</div>
+      <div class="mode-desc">10 curated questions daily — builds consistency and earns daily rewards</div>
+      <div class="mode-pill" style="background:rgba(16,185,129,.13);color:var(--grn);border:1px solid rgba(16,185,129,.26)">+50 XP Daily</div>
+    </div>
+    <div class="mode-card" onclick="startMode('leaderboard')">
+      <div class="mode-ico">🏆</div>
+      <div class="mode-nm">Leaderboard</div>
+      <div class="mode-desc">See your rank among all students in this category — weekly & all-time</div>
+      <div class="mode-pill" style="background:rgba(246,211,101,.13);color:var(--gs);border:1px solid rgba(246,211,101,.26)">PYQ Rank Only</div>
+    </div>
+    <div class="mode-card" onclick="openCTBuilder()" style="border-color:rgba(139,92,246,.4);background:rgba(139,92,246,.06)">
+      <div class="mode-ico">🎛️</div>
+      <div class="mode-nm">Custom Test</div>
+      <div class="mode-desc">Set your own question count, subject & difficulty — no rank impact</div>
+      <div class="mode-pill" style="background:rgba(139,92,246,.13);color:var(--pur);border:1px solid rgba(139,92,246,.26)">No Ranking</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ===== SCREEN 4: QUIZ BLITZ ===== -->
+<div class="screen" id="s-blitz">
+  <div class="back-btn" onclick="goBack('s-modes');clearInterval(blitzTimer)">← Exit Mode</div>
+  <div class="quiz-wrap">
+    <div class="qb-header">
+      <div><div style="font-size:15px;font-weight:800">⚡ Quiz Blitz</div><div class="qb-info" id="blitz-exam-name">SSC CGL • Quant</div></div>
+      <div class="qb-stats-row">
+        <div class="qb-stat"><div class="qb-sv" id="blitz-score" style="color:var(--grn)">0</div><div class="qb-sl">Score</div></div>
+        <div class="qb-stat"><div class="qb-sv" id="blitz-q-count">1/15</div><div class="qb-sl">Question</div></div>
+        <div class="timer-ring-wrap">
+          <svg width="64" height="64" viewBox="0 0 64 64"><circle class="timer-ring-bg" cx="32" cy="32" r="28"/><circle class="timer-ring-fill" id="timerRing" cx="32" cy="32" r="28" stroke-dasharray="175.9" stroke-dashoffset="0"/></svg>
+          <div class="timer-ring-txt" id="timerRingTxt">15</div>
+        </div>
+      </div>
+    </div>
+    <div class="streak-bar" id="streakBar" style="display:none">
+      🔥 <span id="streakCount">0</span>-Streak! &nbsp; <span style="color:var(--gs)" id="multiplier">×1.0 XP</span>
+    </div>
+    <div class="qb-card">
+      <div class="qb-topic" id="blitz-topic">SSC CGL 2023 • Quantitative Aptitude</div>
+      <div class="qb-q" id="blitz-q">Loading question...</div>
+      <div class="qb-opts" id="blitz-opts"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--mut)">
+      <span>+4 XP for correct &nbsp;|&nbsp; Streak bonus up to ×3</span>
+      <span id="blitz-xp" style="color:var(--gs);font-weight:700">0 XP Earned</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ===== SCREEN 5: BATTLE MODE ===== -->
+<div class="screen" id="s-battle">
+  <div class="back-btn" onclick="goBack('s-modes');clearInterval(battleTimer)">← Exit Battle</div>
+  <div class="battle-wrap">
+    <div class="battle-header">
+      <div class="player-card">
+        <div class="p-avatar you">👑</div>
+        <div class="p-name">YOU</div>
+        <div class="p-rank" id="battle-your-score">Score: 0</div>
+        <div class="hp-wrap">
+          <div class="hp-bar"><div class="hp-fill" id="your-hp" style="width:100%"></div></div>
+          <div class="hp-txt" id="your-hp-txt">100 HP</div>
+        </div>
+      </div>
+      <div class="vs-badge">VS</div>
+      <div class="player-card">
+        <div class="p-avatar bot">💀</div>
+        <div class="p-name">BOT (HARD)</div>
+        <div class="p-rank" id="battle-bot-score">Score: 0</div>
+        <div class="hp-wrap">
+          <div class="hp-bar"><div class="hp-fill" id="bot-hp" style="width:100%;background:var(--red)"></div></div>
+          <div class="hp-txt" id="bot-hp-txt">100 HP</div>
+        </div>
+      </div>
+    </div>
+    <div class="battle-timer-bar"><div class="bt-fill" id="bt-fill"></div></div>
+    <div class="battle-q-card">
+      <div class="bq-meta" id="battle-meta">Railway NTPC • Maths • Q1/10</div>
+      <div class="bq-text" id="battle-q">Loading...</div>
+      <div class="battle-opts" id="battle-opts"></div>
+    </div>
+  </div>
+  <div class="battle-fx" id="battle-fx">⚡</div>
+</div>
+
+
+<!-- ===== SCREEN 6: LEADERBOARD ===== -->
+<div class="screen" id="s-leaderboard">
+  <div class="back-btn" onclick="goBack('s-modes')">← Back</div>
+  <div class="lb-header">
+    <div style="font-size:22px;font-weight:800;margin-bottom:4px">🏆 <span class="gold-text">Leaderboard</span></div>
+    <div style="font-size:11px;color:var(--mut)" id="lb-title">SSC CGL — All Time</div>
+    <div style="margin-top:10px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-sec" style="font-size:11px;padding:5px 14px">Weekly</button>
+      <button class="btn btn-gold" style="font-size:11px;padding:5px 14px">All Time</button>
+    </div>
+  </div>
+  <div id="lb-list"></div>
+</div>
+
+
+
+
+<!-- ===== SCREEN 7: CUSTOM TEST BUILDER ===== -->
+<div class="screen" id="s-custom">
+  <div class="back-btn" onclick="ctExitBuilder()">← Back to Gaming Zone</div>
+  <div style="font-size:19px;font-weight:800;margin-bottom:3px">Build Your <span class="gold-text">Custom Test</span></div>
+  <div style="font-size:12px;color:var(--mut);margin-bottom:18px">Configure every detail of your test</div>
+
+
+  <!-- Stepper -->
+  <div class="ct-step-wrap" id="ct-stepper">
+    <div class="ct-si active" id="ct-si-0" onclick="ctTryGoStep(0)"><div class="ct-si-num">1</div>Category</div>
+    <div class="ct-step-line"></div>
+    <div class="ct-si" id="ct-si-1" onclick="ctTryGoStep(1)"><div class="ct-si-num">2</div>Exam &amp; Subjects</div>
+    <div class="ct-step-line"></div>
+    <div class="ct-si" id="ct-si-2" onclick="ctTryGoStep(2)"><div class="ct-si-num">3</div>Topics</div>
+    <div class="ct-step-line"></div>
+    <div class="ct-si" id="ct-si-3" onclick="ctTryGoStep(3)"><div class="ct-si-num">4</div>Questions &amp; Time</div>
+    <div class="ct-step-line"></div>
+    <div class="ct-si" id="ct-si-4" onclick="ctTryGoStep(4)"><div class="ct-si-num">5</div>Marking</div>
+    <div class="ct-step-line"></div>
+    <div class="ct-si" id="ct-si-5" onclick="ctTryGoStep(5)"><div class="ct-si-num">6</div>Review &amp; Launch</div>
+  </div>
+
+
+  <div id="ct-step-panel"></div>
+</div>
+
+
+
+
+</div><!-- end main -->
+
+
+<!-- CHARACTER POPUP -->
+<div class="char-popup-overlay" id="char-popup">
+  <div class="char-popup" id="char-popup-inner">
+    <div class="cp-banner" id="cp-banner">
+      <div class="cp-inner">
+        <div class="cp-cat" id="cp-cat">CATEGORY</div>
+        <div class="cp-chars-row" id="cp-chars-row"></div>
+        <div style="margin-top:28px">
+          <div class="cp-name" id="cp-char-name">Loading...</div>
+          <div class="cp-desc" id="cp-char-role">—</div>
+        </div>
+      </div>
+    </div>
+    <div class="cp-body">
+      <div class="cp-quote">
+        <div class="cp-quote-icon">💬</div>
+        <div id="cp-quote-text">Loading...</div>
+      </div>
+      <button class="cp-continue btn btn-gold" id="cp-continue-btn" onclick="continueAfterChar()" style="width:100%;justify-content:center;font-size:14px;padding:14px">Let's Go! 🚀</button>
+    </div>
+  </div>
+</div>
+
+
+
+
+<!-- FULLSCREEN: TEST ENGINE -->
+<div id="ct-test-wrap">
+  <div class="ct-th">
+    <div>
+      <div class="ct-th-exam" id="ct-th-exam">Custom Test</div>
+      <div class="ct-th-sec" id="ct-th-sec">Loading...</div>
+    </div>
+    <div class="ct-th-sp"></div>
+    <div class="ct-timer" id="ct-timer">01:00:00</div>
+    <button class="ct-th-sub" onclick="ctOpenSubmit()">Submit Test</button>
+  </div>
+  <div class="ct-sec-tabs" id="ct-sec-tabs"></div>
+  <div class="ct-test-body">
+    <div style="display:flex;flex-direction:column;flex:1;overflow:hidden">
+      <div class="ct-q-area" id="ct-q-area">
+        <div class="ct-qbrow">
+          <div class="ct-qnbadge">Q <span id="ct-qcur">1</span>&thinsp;/&thinsp;<span id="ct-qtot">50</span></div>
+          <div class="ct-qtbadge" id="ct-qtopic">Topic</div>
+        </div>
+        <div class="ct-qtext" id="ct-qtext">Loading...</div>
+        <div class="ct-opts" id="ct-opts"></div>
+        <div class="ct-qmeta">
+          <span class="ct-qmi">✅ <span id="ct-qm-pos">+1 correct</span></span>
+          <span class="ct-qmi">❌ <span id="ct-qm-neg">−0.25 wrong</span></span>
+          <span class="ct-qmi">⏱ <span id="ct-qm-spd">72 sec/Q avg</span></span>
+        </div>
+      </div>
+      <div class="ct-footer">
+        <div style="display:flex;gap:7px">
+          <button type="button" class="ct-ftb ct-ftb-rev" onclick="ctMarkRev()">🔖 Review</button>
+          <button type="button" class="ct-ftb ct-ftb-clr" onclick="ctClearResp()">✕ Clear</button>
+        </div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap">
+          <button type="button" class="ct-ftb ct-ftb-nav" onclick="ctPrevQ()">← Prev</button>
+          <button type="button" class="ct-ftb ct-ftb-save" id="ct-save-btn" onclick="ctSaveNext()">Save &amp; Next →</button>
+          <button type="button" class="ct-ftb ct-ftb-sub" onclick="ctOpenSubmit()">Submit 📋</button>
+        </div>
+      </div>
+    </div>
+    <!-- Question Palette -->
+    <div class="ct-palette">
+      <div class="ct-pal-hd">
+        <div class="ct-pal-av">RS</div>
+        <div class="ct-pal-nm">Rahul Sharma</div>
+        <div class="ct-pal-roll">BZ-9842</div>
+        <div class="ct-pal-legend">
+          <div class="ct-leg"><div class="ct-ldot" style="background:var(--grn)"></div>Answered</div>
+          <div class="ct-leg"><div class="ct-ldot" style="background:var(--amb)"></div>Review</div>
+          <div class="ct-leg"><div class="ct-ldot" style="background:rgba(239,68,68,.4)"></div>Visited</div>
+          <div class="ct-leg"><div class="ct-ldot" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12)"></div>Not Visited</div>
+        </div>
+      </div>
+      <div id="ct-pal-body"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- FULLSCREEN: RESULT + SWOT -->
+<div id="ct-result-wrap">
+  <div class="ct-ri">
+    <div style="display:flex;align-items:center;gap:9px;margin-bottom:20px">
+      <div class="back-btn" onclick="ctExitResult()">← Back</div>
+      <button type="button" class="btn btn-gold" onclick="ctOpenReview()" style="font-size:11px;padding:6px 14px">📝 Review Questions</button>
+      <button type="button" class="btn btn-sec" onclick="ctRetake()" style="font-size:11px;padding:6px 14px">🔄 Retake</button>
+      <button type="button" class="btn btn-sec" onclick="openCTBuilder()" style="font-size:11px;padding:6px 14px">⚙️ New Test</button>
+    </div>
+    <div class="ct-res-hero">
+      <div style="font-size:10px;color:rgba(255,255,255,.5);font-family:var(--mono);margin-bottom:10px" id="ct-res-tag">—</div>
+      <div class="ct-sring"><div class="ct-snum" id="ct-snum">—</div><div class="ct-stot" id="ct-stot">/50</div></div>
+      <div class="ct-grade" id="ct-grade">—</div>
+      <div class="ct-pct">Better than <b id="ct-pct">—</b> of all candidates</div>
+    </div>
+    <div class="ct-res-stats">
+      <div class="ct-rs"><div class="ct-rsv" id="cr-correct" style="color:var(--grn)">—</div><div class="ct-rsl">Correct</div></div>
+      <div class="ct-rs"><div class="ct-rsv" id="cr-wrong" style="color:var(--red)">—</div><div class="ct-rsl">Wrong</div></div>
+      <div class="ct-rs"><div class="ct-rsv" id="cr-skip" style="color:var(--mut)">—</div><div class="ct-rsl">Skipped</div></div>
+      <div class="ct-rs"><div class="ct-rsv" id="cr-acc" style="color:var(--blue)">—</div><div class="ct-rsl">Accuracy</div></div>
+      <div class="ct-rs"><div class="ct-rsv" id="cr-time">—</div><div class="ct-rsl">Time Used</div></div>
+      <div class="ct-rs"><div class="ct-rsv" id="cr-spd">—</div><div class="ct-rsl">Speed</div></div>
+      <div class="ct-rs"><div class="ct-rsv" id="cr-rank" style="color:var(--gs)">—</div><div class="ct-rsl">Est. Rank</div></div>
+      <div class="ct-rs"><div class="ct-rsv" id="cr-cutoff" style="color:var(--amb)">—</div><div class="ct-rsl">Est. Cutoff</div></div>
+    </div>
+    <!-- Subject Performance -->
+    <div class="ct-card" style="margin-bottom:13px">
+      <div class="ct-ch"><div class="ct-ct">📊 Subject-wise Performance</div></div>
+      <div class="ct-cb2"><div class="ct-sp-list" id="ct-sp-list"></div></div>
+    </div>
+    <!-- Topic Accuracy -->
+    <div class="ct-card" style="margin-bottom:13px">
+      <div class="ct-ch"><div class="ct-ct">🔍 Topic-wise Accuracy</div></div>
+      <div class="ct-cb2"><div class="ct-ta-grid" id="ct-ta-grid"></div></div>
+    </div>
+    <!-- SWOT -->
+    <div class="ct-card" style="margin-bottom:13px">
+      <div class="ct-ch">
+        <div class="ct-ct">🧠 SWOT Analysis</div>
+        <span class="badge b-pur">AI Generated</span>
+      </div>
+      <div class="ct-cb2">
+        <div style="font-size:12px;color:var(--mut);text-align:center;margin-bottom:14px">Your personalised strength / weakness / opportunity / threat breakdown from this attempt</div>
+        <div class="ct-swot-grid">
+          <div class="ct-swot sw-s"><div class="ct-swot-hd"><span style="font-size:20px">💪</span><div class="ct-swot-title">Strengths</div></div><div class="ct-swot-items" id="ct-sw-s"></div></div>
+          <div class="ct-swot sw-w"><div class="ct-swot-hd"><span style="font-size:20px">⚠️</span><div class="ct-swot-title">Weaknesses</div></div><div class="ct-swot-items" id="ct-sw-w"></div></div>
+          <div class="ct-swot sw-o"><div class="ct-swot-hd"><span style="font-size:20px">🚀</span><div class="ct-swot-title">Opportunities</div></div><div class="ct-swot-items" id="ct-sw-o"></div></div>
+          <div class="ct-swot sw-t"><div class="ct-swot-hd"><span style="font-size:20px">🔴</span><div class="ct-swot-title">Threats</div></div><div class="ct-swot-items" id="ct-sw-t"></div></div>
+        </div>
+      </div>
+    </div>
+    <!-- AI Insight -->
+    <div class="ct-ai-card">
+      <div class="ct-ai-hd"><span style="font-size:18px">🤖</span><span style="font-size:13px;font-weight:700;color:var(--pur)">AI Coach Insight</span><span class="badge b-pur" style="margin-left:auto">Personalised</span></div>
+      <div class="ct-ai-txt" id="ct-ai-txt">Analysing your performance...</div>
+    </div>
+    <!-- Study Plan -->
+    <div class="ct-card" style="margin-bottom:20px">
+      <div class="ct-ch"><div class="ct-ct">📅 7-Day Study Plan</div><span class="badge b-grn">Weak area based</span></div>
+      <div class="ct-cb2"><div class="ct-plan-list" id="ct-plan"></div></div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<!-- FULLSCREEN: QUESTION REVIEW (after submit) -->
+<div id="ct-review-wrap">
+  <div class="ct-rev-inner">
+    <!-- Header -->
+    <div class="ct-rev-header">
+      <div>
+        <div style="font-size:16px;font-weight:800;margin-bottom:3px">📝 Question Review</div>
+        <div style="font-size:11px;color:var(--mut)" id="ct-rev-subtitle">Dekhein kya sahi kiya, kya galat</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px"><span style="width:10px;height:10px;border-radius:3px;background:var(--grn);display:inline-block"></span>Correct</div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px"><span style="width:10px;height:10px;border-radius:3px;background:var(--red);display:inline-block"></span>Wrong</div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px"><span style="width:10px;height:10px;border-radius:3px;background:var(--mut);display:inline-block"></span>Skipped</div>
+      </div>
+    </div>
+
+
+    <!-- Progress bar -->
+    <div class="ct-rev-progress"><div class="ct-rev-progress-fill" id="ct-rev-prog" style="width:0%"></div></div>
+
+
+    <!-- Question jump grid -->
+    <div class="ct-card" style="margin-bottom:16px">
+      <div class="ct-ch"><div class="ct-ct">🗂 Jump to Question</div><span class="badge b-gold" id="ct-rev-score-badge">—</span></div>
+      <div class="ct-rev-jump-grid" id="ct-rev-jump"></div>
+    </div>
+
+
+    <!-- Current question card -->
+    <div id="ct-rev-qcard"></div>
+
+
+    <!-- Sticky nav -->
+    <div class="ct-rev-sticky">
+      <button type="button" class="ct-ftb ct-ftb-nav" onclick="ctRevPrev()" id="ct-rev-prev">← Prev</button>
+      <div class="ct-rev-num" id="ct-rev-num">Q 1 / 1</div>
+      <button type="button" class="ct-ftb ct-ftb-save" onclick="ctRevNext()" id="ct-rev-next">Next →</button>
+      <button type="button" class="ct-ftb ct-ftb-sub" onclick="ctExitReview()" style="margin-left:auto">📊 Back to Results</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Submit Confirmation Modal -->
+<div class="ct-overlay" id="ct-sub-overlay">
+  <div class="ct-modal">
+    <div class="ct-mhd">
+      <div class="ct-mico">⚠️</div>
+      <div class="ct-mtitle">Submit Test?</div>
+      <div class="ct-msub">You cannot change answers after submitting</div>
+    </div>
+    <div class="ct-mstats">
+      <div class="ct-mstat"><div class="ct-msv" id="ct-ms-ans" style="color:var(--grn)">0</div><div class="ct-msl">Answered</div></div>
+      <div class="ct-mstat"><div class="ct-msv" id="ct-ms-unans" style="color:var(--red)">0</div><div class="ct-msl">Not Answered</div></div>
+      <div class="ct-mstat"><div class="ct-msv" id="ct-ms-rev" style="color:var(--amb)">0</div><div class="ct-msl">Marked Review</div></div>
+      <div class="ct-mstat"><div class="ct-msv" id="ct-ms-unvis" style="color:var(--hint)">0</div><div class="ct-msl">Not Visited</div></div>
+    </div>
+    <div class="ct-mbtns">
+      <button class="btn btn-sec ct-btn-full" onclick="ctCloseSubmit()">← Go Back</button>
+      <button class="btn btn-gold ct-btn-full" onclick="ctDoSubmit()">✅ Submit Now</button>
+    </div>
+  </div>
+</div>
+
+
+
+
+<div class="notif" id="nbox"><div class="nd" id="nd"></div><span id="nt"></span></div>
+
+
+<script>
+// =============================================
+// DATA
+// =============================================
+const CAT_DATA={
+  defence:{name:'Defence',desc:'NDA • CDS • AFCAT',color:'#ef4444',bg:'linear-gradient(135deg,#1a0a0a,#2d0f0f)',exams:['NDA Paper 1 — Maths','NDA Paper 2 — GAT','CDS Paper 1 — Maths','CDS Paper 2 — English','AFCAT Paper','Army GD'],chars:[{em:'🪖',name:'Major Arjun',role:'Army Officer & NDA Expert',cls:'float0'},{em:'✈️',name:'Wing Cdr. Priya',role:'IAF Pilot & AFCAT Specialist',cls:'float1'},{em:'⚓',name:'Lt. Raj',role:'Navy Officer & CDS Guide',cls:'float2'},{em:'🏥',name:'Capt. Meera',role:'Army Medical & MNS',cls:'float3'}],quote:'You\'re built for this. Every question you answer brings you one step closer to the uniform. Jai Hind! 🇮🇳'},
+  ssc:{name:'SSC',desc:'CGL • CHSL • MTS',color:'#f59e0b',bg:'linear-gradient(135deg,#1a1200,#2d1f00)',exams:['SSC CGL Tier 1','SSC CGL Tier 2','SSC CHSL','SSC MTS','SSC GD Constable','SSC CPO'],chars:[{em:'📊',name:'Officer Rahul',role:'CGL Expert & Tax Inspector',cls:'float0'},{em:'👩‍💼',name:'Clerk Sunita',role:'CHSL Topper & Data Expert',cls:'float1'},{em:'🔍',name:'Inspector Vishal',role:'SSC GD & Police Specialist',cls:'float2'}],quote:'Sarkari naukri door nahi! Ek-ek question practice karo, success guaranteed hai. 💪'},
+  upsc:{name:'UPSC',desc:'CSE Prelims • Mains',color:'#8b5cf6',bg:'linear-gradient(135deg,#0f0a1a,#1a0f2d)',exams:['CSE Prelims GS','CSE Prelims CSAT','CSE Mains GS1','CSE Mains GS2','IFS Prelims','NDA (UPSC)'],chars:[{em:'🎖️',name:'IAS Aakash',role:'IAS Officer & SDM',cls:'float0'},{em:'👩‍⚖️',name:'IPS Rekha',role:'IPS Officer & SP',cls:'float1'},{em:'🌿',name:'IFS Rohan',role:'Forest Officer & IFS',cls:'float2'}],quote:'IAS banna hai toh commitment chahiye. Har din ek kadam aage. Bharat ka future tum ho! 🇮🇳'},
+  banking:{name:'Banking',desc:'IBPS • SBI • RBI',color:'#10b981',bg:'linear-gradient(135deg,#001a10,#002d1a)',exams:['IBPS PO','IBPS Clerk','SBI PO','SBI Clerk','RBI Grade B','NABARD'],chars:[{em:'🏦',name:'PO Meera',role:'Bank PO & IBPS Expert',cls:'float0'},{em:'💳',name:'Manager Arun',role:'SBI Manager & Credit Pro',cls:'float1'},{em:'📈',name:'Officer Priya',role:'RBI Grade B & Finance',cls:'float2'}],quote:'Banking sector ka gateway khul raha hai. Maths strong karo, job pakki hai! 💰'},
+  railway:{name:'Railway',desc:'NTPC • ALP • JE',color:'#3b82f6',bg:'linear-gradient(135deg,#000d1a,#001a2d)',exams:['Railway NTPC','ALP Technical','Junior Engineer','Railway Group D','Station Master','RPF Constable'],chars:[{em:'🚂',name:'Guard Rajan',role:'Station Master & NTPC',cls:'float0'},{em:'⚙️',name:'Engineer Dev',role:'ALP & Technical Expert',cls:'float1'}],quote:'Indian Railways — ek naukri jo pure desh ko connect karti hai. Taiyar ho? 🚂'},
+  nta:{name:'NTA / Academic',desc:'JEE • NEET • CUET',color:'#ec4899',bg:'linear-gradient(135deg,#1a0010,#2d0020)',exams:['JEE Main','JEE Advanced','NEET UG','CUET UG','UGC NET','CSIR NET'],chars:[{em:'🔬',name:'Dr. Kavya',role:'NEET Topper & MBBS',cls:'float0'},{em:'⚛️',name:'Engineer Ishaan',role:'JEE Expert & IITian',cls:'float1'},{em:'📚',name:'Scholar Anita',role:'CUET & Delhi Uni Guide',cls:'float2'}],quote:'Science aur math tumhare hathiyaar hain. Doctor ya Engineer — destiny awaits! 🎓'}
+};
+
+
+const QUESTIONS=[
+  {q:'The square root of 0.0009 is?',opts:['0.3','0.03','0.003','3.0'],ans:1,topic:'Railway NTPC • Maths'},
+  {q:'If the sum of two numbers is 25 and their product is 150, find the smaller number.',opts:['10','12','15','8'],ans:0,topic:'IBPS PO • Quant'},
+  {q:'A train 240m long passes a bridge 120m long in 24 seconds. What is the speed (km/h)?',opts:['54','60','72','45'],ans:0,topic:'SSC CGL • Quant'},
+  {q:'The compound interest on ₹10,000 at 10% per annum for 2 years?',opts:['₹2,000','₹2,100','₹2,200','₹1,900'],ans:1,topic:'SBI PO • Quant'},
+  {q:'If SOLDIER is coded as PKJAICP, then CAPTAIN is coded as?',opts:['BZKOMHO','BZKOMHO','BZKNOHO','BZLOMHO'],ans:0,topic:'NDA • Reasoning'},
+  {q:'Who is the author of "Discovery of India"?',opts:['M.K. Gandhi','Jawaharlal Nehru','S. Radhakrishnan','Rabindranath Tagore'],ans:1,topic:'UPSC Prelims • History'},
+  {q:'The Battle of Plassey was fought in which year?',opts:['1757','1764','1747','1761'],ans:0,topic:'SSC CGL • GK'},
+  {q:'Which article of the Indian Constitution deals with Right to Equality?',opts:['Art. 12','Art. 14','Art. 19','Art. 21'],ans:1,topic:'UPSC • Polity'},
+];
+
+
+// STATE
+let curCat='';
+let curExam='';
+let curMode='';
+let blitzTimer;
+let blitzQ=0;
+let blitzScore=0;
+let blitzStreak=0;
+let blitzXP=0;
+let blitzSecsLeft=15;
+let blitzAnswered=false;
+let battleTimer;
+let battleQ=0;
+let yourHP=100;
+let botHP=100;
+let yourScore=0;
+let botScore=0;
+let battleSecsLeft=10;
+let pendingScreen='';
+
+
+// =============================================
+// NAVIGATION
+// =============================================
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+
+function goBack(to){showScreen(to)}
+
+
+// =============================================
+// CAT SELECT → show mascot popup
+// =============================================
+function selectCat(cat){
+  curCat=cat;
+  pendingScreen='s-exams';
+  showCharPopup(cat);
+}
+
+
+function showCharPopup(cat){
+  const d=CAT_DATA[cat];
+  document.getElementById('cp-cat').textContent=d.name.toUpperCase();
+  document.getElementById('cp-quote-text').textContent=d.quote;
+  // Banner BG
+  const banner=document.getElementById('cp-banner');
+  banner.style.background=d.bg;
+  // Chars row
+  const row=document.getElementById('cp-chars-row');
+  row.innerHTML='';
+  d.chars.forEach((c,i)=>{
+    const wrap=document.createElement('div');
+    wrap.style.cssText='position:relative;text-align:center;margin-bottom:24px';
+    wrap.innerHTML=`
+      <div class="${c.cls}" style="width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.08);border:${i===0?'3px solid rgba(255,255,255,.8)':'2px solid rgba(255,255,255,.25)'};display:flex;align-items:center;justify-content:center;font-size:34px;cursor:pointer;transition:all .2s" onclick="selectChar(this,${i},'${cat}')">
+        ${c.em}
+      </div>
+      <div style="position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);font-size:9px;white-space:nowrap;color:rgba(255,255,255,.6);font-weight:600">${c.name.split(' ')[0]}</div>
+    `;
+    row.appendChild(wrap);
+    if(i===0){
+      document.getElementById('cp-char-name').textContent=c.name;
+      document.getElementById('cp-char-role').textContent=c.role;
+    }
+  });
+  // Continue btn color
+  document.getElementById('cp-continue-btn').style.background=`linear-gradient(135deg,${d.color},${d.color}aa)`;
+  document.getElementById('char-popup').classList.add('open');
+}
+
+
+function selectChar(el,i,cat){
+  const d=CAT_DATA[cat];
+  document.querySelectorAll('#cp-chars-row > div > div').forEach(x=>x.style.border='2px solid rgba(255,255,255,.25)');
+  el.style.border='3px solid rgba(255,255,255,.9)';
+  document.getElementById('cp-char-name').textContent=d.chars[i].name;
+  document.getElementById('cp-char-role').textContent=d.chars[i].role;
+}
+
+
+function continueAfterChar(){
+  document.getElementById('char-popup').classList.remove('open');
+  if(pendingScreen==='s-exams') loadExamScreen();
+}
+
+
+// =============================================
+// EXAM SCREEN
+// =============================================
+function loadExamScreen(){
+  const d=CAT_DATA[curCat];
+  document.getElementById('exam-cat-title').textContent=d.name+' — Select Exam';
+  document.getElementById('exam-cat-sub').textContent=d.desc+' • Choose your target exam';
+  const list=document.getElementById('exam-list');
+  list.innerHTML='';
+  d.exams.forEach(ex=>{
+    const el=document.createElement('div');
+    el.className='exam-item';
+    el.innerHTML=`<div class="ei-left"><span class="ei-ico">${{defence:'🪖',ssc:'📋',upsc:'🎖️',banking:'🏦',railway:'🚂',nta:'🎓'}[curCat]}</span><div><div class="ei-name">${ex}</div><div class="ei-desc">PYQs from 2009–2024 • 15 years</div></div></div><span class="ei-arrow">→</span>`;
+    el.onclick=()=>{curExam=ex;loadModeScreen()};
+    list.appendChild(el);
+  });
+  showScreen('s-exams');
+}
+
+
+function loadModeScreen(){
+  document.getElementById('mode-exam-title').textContent=curExam;
+  document.getElementById('mode-exam-sub').textContent='Choose how you want to practice — Play. Learn. Score Higher.';
+  showScreen('s-modes');
+}
+
+
+function startMode(mode){
+  curMode=mode;
+  if(mode==='blitz') startBlitz();
+  else if(mode==='battle') startBattle();
+  else if(mode==='leaderboard') showLeaderboard();
+  else if(mode==='pyq') notif('PYQ Marathon starting — full paper mode! 📚','#3b82f6');
+  else if(mode==='daily') notif('Daily Spark — 10 questions loaded! ☀️','#10b981');
+  else if(mode==='custom') notif('Custom Test — configure your test! 🎛️','#8b5cf6');
+}
+
+
+// =============================================
+// QUIZ BLITZ
+// =============================================
+function startBlitz(){
+  blitzQ=0;blitzScore=0;blitzStreak=0;blitzXP=0;
+  document.getElementById('blitz-exam-name').textContent=curExam+' • Mixed Subjects';
+  showScreen('s-blitz');
+  loadBlitzQ();
+}
+
+
+function loadBlitzQ(){
+  if(blitzQ>=15){endBlitz();return;}
+  blitzAnswered=false;
+  const q=QUESTIONS[blitzQ%QUESTIONS.length];
+  document.getElementById('blitz-q-count').textContent=(blitzQ+1)+'/15';
+  document.getElementById('blitz-topic').textContent=q.topic;
+  document.getElementById('blitz-q').textContent=q.q;
+  const opts=document.getElementById('blitz-opts');
+  opts.innerHTML='';
+  q.opts.forEach((o,i)=>{
+    const btn=document.createElement('button');
+    btn.className='qb-opt';btn.textContent=o;
+    btn.onclick=()=>blitzAnswer(i,q.ans,btn);
+    opts.appendChild(btn);
+  });
+  blitzSecsLeft=15;
+  document.getElementById('timerRingTxt').textContent=15;
+  document.getElementById('timerRing').style.strokeDashoffset=0;
+  document.getElementById('timerRing').style.stroke='var(--grn)';
+  clearInterval(blitzTimer);
+  blitzTimer=setInterval(()=>{
+    blitzSecsLeft--;
+    const pct=1-(blitzSecsLeft/15);
+    const circ=175.9;
+    document.getElementById('timerRing').style.strokeDashoffset=pct*circ;
+    document.getElementById('timerRingTxt').textContent=blitzSecsLeft;
+    if(blitzSecsLeft<=5) document.getElementById('timerRing').style.stroke='var(--red)';
+    if(blitzSecsLeft<=0){clearInterval(blitzTimer);if(!blitzAnswered) blitzTimeout();}
+  },1000);
+}
+
+
+function blitzAnswer(sel,ans,btn){
+  if(blitzAnswered) return;
+  blitzAnswered=true;
+  clearInterval(blitzTimer);
+  const opts=document.querySelectorAll('.qb-opt');
+  opts[ans].classList.add('correct');
+  if(sel===ans){
+    blitzStreak++;blitzScore++;
+    const mult=blitzStreak>=5?3:blitzStreak>=3?2:blitzStreak>=2?1.5:1;
+    blitzXP+=Math.round(4*mult);
+    document.getElementById('blitz-score').textContent=blitzScore;
+    document.getElementById('blitz-xp').textContent=blitzXP+' XP Earned';
+    if(blitzStreak>1){
+      const sb=document.getElementById('streakBar');
+      sb.style.display='flex';
+      document.getElementById('streakCount').textContent=blitzStreak;
+      document.getElementById('multiplier').textContent='×'+mult+' XP';
+    }
+    notif('✅ Correct! +'+Math.round(4*mult)+' XP','#10b981');
+  } else {
+    btn.classList.add('wrong');blitzStreak=0;
+    document.getElementById('streakBar').style.display='none';
+    notif('❌ Wrong!','#ef4444');
+  }
+  blitzQ++;
+  setTimeout(loadBlitzQ,900);
+}
+
+
+function blitzTimeout(){
+  blitzStreak=0;blitzQ++;
+  document.querySelectorAll('.qb-opt').forEach((o,i)=>{if(i===QUESTIONS[(blitzQ-1)%QUESTIONS.length].ans)o.classList.add('correct')});
+  notif('⏰ Time out!','#f59e0b');
+  setTimeout(loadBlitzQ,700);
+}
+
+
+function endBlitz(){
+  clearInterval(blitzTimer);
+  notif(`⚡ Blitz done! Score: ${blitzScore}/15 — ${blitzXP} XP earned 🎉`,'#f6d365');
+  setTimeout(()=>showScreen('s-modes'),2500);
+}
+
+
+// =============================================
+// BATTLE MODE
+// =============================================
+function startBattle(){
+  yourHP=100;botHP=100;yourScore=0;botScore=0;battleQ=0;
+  document.getElementById('your-hp').style.width='100%';
+  document.getElementById('bot-hp').style.width='100%';
+  document.getElementById('your-hp-txt').textContent='100 HP';
+  document.getElementById('bot-hp-txt').textContent='100 HP';
+  document.getElementById('battle-your-score').textContent='Score: 0';
+  document.getElementById('battle-bot-score').textContent='Score: 0';
+  showScreen('s-battle');
+  loadBattleQ();
+}
+
+
+function loadBattleQ(){
+  if(battleQ>=10){endBattle();return;}
+  const q=QUESTIONS[battleQ%QUESTIONS.length];
+  document.getElementById('battle-meta').textContent=curExam+' • Q'+(battleQ+1)+'/10';
+  document.getElementById('battle-q').textContent=q.q;
+  const opts=document.getElementById('battle-opts');
+  opts.innerHTML='';
+  q.opts.forEach((o,i)=>{
+    const btn=document.createElement('button');
+    btn.className='b-opt';btn.textContent=o;
+    btn.onclick=()=>battleAnswer(i,q.ans,btn);
+    opts.appendChild(btn);
+  });
+  battleSecsLeft=10;
+  document.getElementById('bt-fill').style.width='100%';
+  document.getElementById('bt-fill').style.transition='none';
+  setTimeout(()=>{
+    document.getElementById('bt-fill').style.transition='width 10s linear';
+    document.getElementById('bt-fill').style.width='0%';
+  },50);
+  clearInterval(battleTimer);
+  battleTimer=setInterval(()=>{
+    battleSecsLeft--;
+    if(battleSecsLeft<=0){clearInterval(battleTimer);botTurn();}
+  },1000);
+}
+
+
+function battleAnswer(sel,ans,btn){
+  clearInterval(battleTimer);
+  document.querySelectorAll('.b-opt').forEach(b=>b.style.pointerEvents='none');
+  document.querySelectorAll('.b-opt')[ans].classList.add('correct');
+  if(sel===ans){
+    yourScore++;
+    const dmg=20;botHP=Math.max(0,botHP-dmg);
+    document.getElementById('bot-hp').style.width=botHP+'%';
+    document.getElementById('bot-hp-txt').textContent=botHP+' HP';
+    if(botHP<=30) document.getElementById('bot-hp').classList.add('low');
+    document.getElementById('battle-your-score').textContent='Score: '+yourScore;
+    showBattleFX('⚡');
+    notif('💥 Correct! Bot took 20 damage!','#10b981');
+  } else {
+    btn.classList.add('wrong');
+    const dmg=15;yourHP=Math.max(0,yourHP-dmg);
+    document.getElementById('your-hp').style.width=yourHP+'%';
+    document.getElementById('your-hp-txt').textContent=yourHP+' HP';
+    if(yourHP<=30) document.getElementById('your-hp').classList.add('low');
+    showBattleFX('💀');
+    notif('❌ Wrong! You took 15 damage!','#ef4444');
+  }
+  // Bot auto answers
+  setTimeout(()=>{
+    const botCorrect=Math.random()>0.35;
+    if(botCorrect){
+      botScore++;
+      const dmg=15;yourHP=Math.max(0,yourHP-dmg);
+      document.getElementById('your-hp').style.width=yourHP+'%';
+      document.getElementById('your-hp-txt').textContent=yourHP+' HP';
+      if(yourHP<=30) document.getElementById('your-hp').classList.add('low');
+      document.getElementById('battle-bot-score').textContent='Score: '+botScore;
+    }
+    battleQ++;
+    if(yourHP<=0||botHP<=0) endBattle();
+    else setTimeout(loadBattleQ,600);
+  },800);
+}
+
+
+function botTurn(){
+  battleQ++;
+  const botCorrect=Math.random()>0.4;
+  if(botCorrect){
+    botScore++;yourHP=Math.max(0,yourHP-20);
+    document.getElementById('your-hp').style.width=yourHP+'%';
+    document.getElementById('your-hp-txt').textContent=yourHP+' HP';
+    document.getElementById('battle-bot-score').textContent='Score: '+botScore;
+    notif('⏰ Time out! Bot attacked first!','#f59e0b');
+  }
+  if(yourHP<=0||botHP<=0) endBattle();
+  else loadBattleQ();
+}
+
+
+function showBattleFX(emoji){
+  const fx=document.getElementById('battle-fx');
+  fx.textContent=emoji;
+  fx.style.opacity='1';fx.style.transform='translate(-50%,-50%) scale(1.5)';
+  setTimeout(()=>{fx.style.opacity='0';fx.style.transform='translate(-50%,-50%) scale(1)'},400);
+}
+
+
+function endBattle(){
+  clearInterval(battleTimer);
+  if(botHP<=0||yourScore>botScore) notif('🏆 You Won! Amazing battle! +100 XP','#f6d365');
+  else if(yourHP<=0||botScore>yourScore) notif('💀 Bot wins this time! Practice more!','#ef4444');
+  else notif('🤝 Draw! Great battle!','#3b82f6');
+  setTimeout(()=>showScreen('s-modes'),2800);
+}
+
+
+// =============================================
+// LEADERBOARD
+// =============================================
+const LB_DATA=[
+  {rank:1,name:'Amit Kumar',score:9820,streak:20,av:'AK',color:'#f6d365'},
+  {rank:2,name:'Priya Singh',score:9650,streak:15,av:'PS',color:'#8b5cf6'},
+  {rank:3,name:'Rahul Dev',score:9410,streak:12,av:'RD',color:'#10b981'},
+  {rank:4,name:'Sneha Sharma',score:9200,streak:8,av:'SS',color:'#3b82f6'},
+  {rank:5,name:'Vikash Yadav',score:8940,streak:6,av:'VY',color:'#ec4899'},
+  {rank:6,name:'Anjali Mishra',score:8720,streak:5,av:'AM',color:'#f59e0b'},
+  {rank:47,name:'YOU (Rahul Sharma)',score:4280,streak:5,av:'RS',color:'#3b82f6',me:true},
+];
+const MEDALS=['🥇','🥈','🥉'];
+
+
+function showLeaderboard(){
+  document.getElementById('lb-title').textContent=curExam+' — All Time Ranking';
+  const list=document.getElementById('lb-list');
+  list.innerHTML='';
+  LB_DATA.forEach(p=>{
+    const el=document.createElement('div');
+    el.className='lb-row'+(p.rank===1?' top1':p.rank===2?' top2':p.rank===3?' top3':p.me?' mine':'');
+    el.innerHTML=`
+      <div class="lb-rank">${p.rank<=3?MEDALS[p.rank-1]:p.rank}</div>
+      <div class="lb-av" style="background:${p.color}">${p.av}</div>
+      <div>
+        <div class="lb-name">${p.name}${p.me?' <span class="badge b-blue">YOU</span>':''}</div>
+        <div class="lb-meta">🔥 ${p.streak}-streak &nbsp;|&nbsp; PYQ only</div>
+      </div>
+      <div class="lb-score" style="color:${p.rank<=3?'var(--gs)':'var(--txt)'}">${p.score.toLocaleString()}</div>
+    `;
+    list.appendChild(el);
+  });
+  if(LB_DATA.findIndex(p=>p.me)>3){
+    const sep=document.createElement('div');
+    sep.style.cssText='text-align:center;font-size:10px;color:var(--hint);padding:6px;font-family:var(--mono)';
+    sep.textContent='• • •';
+    list.insertBefore(sep,list.lastChild);
+  }
+  showScreen('s-leaderboard');
+}
+
+
+// =============================================
+// UTILS
+// =============================================
+let _nt;
+function notif(msg,color='#f6d365'){
+  clearTimeout(_nt);
+  document.getElementById('nt').textContent=msg;
+  document.getElementById('nd').style.background=color;
+  const b=document.getElementById('nbox');
+  b.classList.add('show');
+  _nt=setTimeout(()=>b.classList.remove('show'),3200);
+}
+
+
+// Close char popup on overlay click
+document.getElementById('char-popup').addEventListener('click',e=>{if(e.target===document.getElementById('char-popup'))document.getElementById('char-popup').classList.remove('open')});
+
+
+// ================================================================
+// CUSTOM TEST BUILDER — DATA
+// ================================================================
+const CT_CAT = {
+  banking:{name:'Banking',ico:'🏦',cls:'cc-banking',
+    exams:['IBPS PO — Prelims','IBPS PO — Mains','IBPS Clerk — Prelims','SBI PO — Prelims','SBI PO — Mains','SBI Clerk','RBI Grade B','NABARD Grade A'],
+    subjects:[
+      {name:'Reasoning Ability',q:35,topics:['Seating Arrangement','Puzzles & Syllogism','Blood Relations','Coding-Decoding','Direction Sense','Inequality','Input-Output','Data Sufficiency']},
+      {name:'Quantitative Aptitude',q:35,topics:['Number Series','Simplification','Data Interpretation','Quadratic Equations','Percentage & Profit','Time & Work','Speed & Distance','Probability']},
+      {name:'English Language',q:30,topics:['Reading Comprehension','Error Spotting','Sentence Rearrangement','Fill in the Blanks','Cloze Test','Phrase / Idiom']},
+      {name:'General Awareness',q:40,topics:['Banking & Finance','Current Affairs','Economy','Govt Schemes','Static GK','Sports & Awards']},
+      {name:'Computer Aptitude',q:20,topics:['Fundamentals','MS Office','Networking','Cyber Security']}]},
+  railway:{name:'Railways',ico:'🚂',cls:'cc-railway',
+    exams:['RRB NTPC CBT-1','RRB NTPC CBT-2','ALP Stage 1','ALP Stage 2 Technical','Railway Group D','Station Master','RPF Constable'],
+    subjects:[
+      {name:'Mathematics',q:30,topics:['Number System','HCF & LCM','Simplification','Percentage','Ratio & Proportion','Average','Time & Work','Speed & Distance','Geometry','Mensuration']},
+      {name:'General Intelligence',q:30,topics:['Analogy','Series','Odd One Out','Coding-Decoding','Blood Relations','Direction Sense','Venn Diagram','Clock & Calendar']},
+      {name:'General Science',q:30,topics:['Physics — Motion','Physics — Electricity','Chemistry — Acids & Bases','Biology — Cell','Biology — Human Physiology']},
+      {name:'General Awareness',q:40,topics:['History','Geography','Polity','Economy','Current Events','Science & Tech']}]},
+  ssc:{name:'SSC',ico:'📋',cls:'cc-ssc',
+    exams:['SSC CGL Tier 1','SSC CGL Tier 2 — Maths','SSC CGL Tier 2 — English','SSC CHSL Tier 1','SSC MTS','SSC GD Constable','SSC CPO Paper 1'],
+    subjects:[
+      {name:'Reasoning & GI',q:25,topics:['Analogy','Number/Letter Series','Odd One Out','Coding-Decoding','Blood Relations','Direction Sense','Venn Diagram','Mirror Image','Paper Folding']},
+      {name:'English Comprehension',q:25,topics:['Reading Comprehension','Sentence Correction','Fill in the Blanks','Idioms & Phrases','One Word Substitution','Antonym / Synonym','Spot the Error']},
+      {name:'Quantitative Aptitude',q:25,topics:['Number System','Percentage','Profit & Loss','Average','Ratio & Proportion','Time & Work','Speed & Distance','Geometry','Mensuration','Trigonometry','DI']},
+      {name:'General Studies',q:25,topics:['History — Ancient & Medieval','History — Modern','Geography — India','Indian Polity','Indian Economy','General Science','Current Affairs']}]},
+  upsc:{name:'UPSC',ico:'🏛️',cls:'cc-upsc',
+    exams:['CSE Prelims GS Paper 1','CSE Prelims CSAT Paper 2','IFS Prelims GS','NDA (UPSC) — GAT','CAPF — Paper 1'],
+    subjects:[
+      {name:'History',q:18,topics:['Ancient India','Medieval India','Modern India — Freedom Movement','World History','Art & Culture']},
+      {name:'Polity & Governance',q:16,topics:['Constitution — Features','Parliament','Executive & Judiciary','Federalism','Fundamental Rights & DPSP','Amendments']},
+      {name:'Geography',q:14,topics:['Physical Geography','Indian Physical Geography','Economic Geography','Human & Social Geography']},
+      {name:'Economy',q:12,topics:['Indian Economy Overview','Planning & Budget','Agriculture','Money & Banking','International Organisations']},
+      {name:'Environment',q:10,topics:['Ecosystems','Biodiversity','Climate Change','Environmental Laws']},
+      {name:'Science & Technology',q:10,topics:['Space Technology','Defence Technology','Biotechnology','IT & AI']},
+      {name:'CSAT',q:20,topics:['Reading Comprehension','Logical Reasoning','Analytical Ability','Basic Numeracy','Data Interpretation']}]},
+  defence:{name:'Defence',ico:'🪖',cls:'cc-defence-ct',
+    exams:['NDA Paper 1 — Mathematics','NDA Paper 2 — GAT','CDS Paper 1 — Maths','CDS Paper 2 — English','CDS Paper 3 — GK','AFCAT Paper','Army GD / Agniveer'],
+    subjects:[
+      {name:'Mathematics',q:120,topics:['Algebra','Matrices & Determinants','Trigonometry','Coordinate Geometry','Calculus','Vectors','Statistics & Probability']},
+      {name:'General Ability — English',q:50,topics:['Grammar & Usage','Vocabulary','Comprehension','Spotting Errors','Para Completion']},
+      {name:'General Ability — GK',q:40,topics:['Physics','Chemistry','General Science','History & Freedom Movement','Geography','Current Events']},
+      {name:'AFCAT — Reasoning',q:30,topics:['Verbal Ability','Spatial Reasoning','Non-Verbal Reasoning','Numerical Ability','Military Aptitude']}]},
+  nta:{name:'NTA / Academic',ico:'🔬',cls:'cc-nta-ct',
+    exams:['JEE Main','JEE Advanced','NEET UG','CUET UG','UGC NET Paper 1','CSIR NET'],
+    subjects:[
+      {name:'Physics',q:35,topics:['Mechanics','Kinematics','Laws of Motion','Work & Energy','Thermodynamics','Waves & Sound','Optics','Electricity','Magnetism','Modern Physics']},
+      {name:'Chemistry',q:35,topics:['Periodic Table & Properties','Chemical Bonding','States of Matter','Thermochemistry','Redox Reactions','Organic Chemistry Basics','Hydrocarbons']},
+      {name:'Mathematics',q:35,topics:['Sets & Relations','Complex Numbers','Quadratic Equations','Matrices','Permutations & Combinations','Limits & Continuity','Differentiation','Integration','Coordinate Geometry','Probability']},
+      {name:'Biology',q:35,topics:['Cell Biology','Genetics & Evolution','Plant Physiology','Human Physiology','Reproduction','Ecology','Biotechnology']}]}
+};
+
+
+const CT_QBANK = [
+  {q:'A train 240m long passes a bridge 120m long in 24 seconds. Speed in km/h?',opts:['A) 54','B) 60','C) 72','D) 45'],ans:0,subj:'Quantitative Aptitude',topic:'Speed & Distance'},
+  {q:'The compound interest on ₹8,000 at 10% p.a. for 2 years is?',opts:['A) ₹1,600','B) ₹1,680','C) ₹1,750','D) ₹1,728'],ans:1,subj:'Quantitative Aptitude',topic:'Percentage & Profit'},
+  {q:'In a row of 30 students, A is 8th from the left, B is 10th from the right. Students between them?',opts:['A) 12','B) 13','C) 14','D) 15'],ans:0,subj:'Reasoning Ability',topic:'Seating Arrangement'},
+  {q:'If TEACHER is coded as PQZOHAM, then STUDENT is coded as?',opts:['A) OPQBMZP','B) OPWBQZP','C) OPQBZMP','D) None of these'],ans:2,subj:'Reasoning Ability',topic:'Coding-Decoding'},
+  {q:'A is the mother of B. B is the sister of C. C is the father of D. How is A related to D?',opts:['A) Grandmother','B) Mother','C) Aunt','D) Sister'],ans:0,subj:'Reasoning Ability',topic:'Blood Relations'},
+  {q:'Choose the correctly spelt word:',opts:['A) Accomodation','B) Accommodation','C) Accomadation','D) Acomodation'],ans:1,subj:'English Language',topic:'Error Spotting'},
+  {q:'Who wrote "Discovery of India"?',opts:['A) M.K. Gandhi','B) Jawaharlal Nehru','C) S. Radhakrishnan','D) Rabindranath Tagore'],ans:1,subj:'General Studies',topic:'History — Modern'},
+  {q:'Which article of the Constitution deals with Right to Equality?',opts:['A) Art. 12','B) Art. 14','C) Art. 19','D) Art. 21'],ans:1,subj:'Polity & Governance',topic:'Fundamental Rights & DPSP'},
+  {q:'RBI was established in which year?',opts:['A) 1930','B) 1935','C) 1947','D) 1950'],ans:1,subj:'General Awareness',topic:'Banking & Finance'},
+  {q:'SI unit of electric charge is?',opts:['A) Ampere','B) Volt','C) Coulomb','D) Ohm'],ans:2,subj:'Physics',topic:'Electricity'},
+  {q:'Chemical formula of glucose is?',opts:['A) C₆H₁₂O₆','B) C₁₂H₂₂O₁₁','C) CH₄','D) C₂H₅OH'],ans:0,subj:'Chemistry',topic:'Biomolecules'},
+  {q:'Powerhouse of the cell is?',opts:['A) Nucleus','B) Ribosome','C) Golgi Body','D) Mitochondria'],ans:3,subj:'Biology',topic:'Cell Biology'},
+  {q:"Newton's second law: F = ?",opts:['A) mv','B) mv\u00b2','C) ma','D) m/a'],ans:2,subj:'Physics',topic:'Laws of Motion'},
+  {q:'The Battle of Plassey was fought in?',opts:['A) 1757','B) 1764','C) 1747','D) 1761'],ans:0,subj:'History',topic:'Modern India — Freedom Movement'},
+  {q:'If 2x + 3y = 12 and x − y = 1, then x = ?',opts:['A) 2','B) 3','C) 4','D) 5'],ans:1,subj:'Mathematics',topic:'Algebra'},
+  {q:'The square root of 0.0016 is?',opts:['A) 0.04','B) 0.4','C) 0.004','D) 4.0'],ans:0,subj:'Mathematics',topic:'Number System'},
+  {q:'Identify the correct sentence:',opts:['A) I am knowing him for years','B) I know him for years','C) I have known him for years','D) I knew him since years'],ans:2,subj:'English Language',topic:'Fill in the Blanks'},
+  {q:'If x + 1/x = 5, then x² + 1/x² = ?',opts:['A) 23','B) 25','C) 27','D) 29'],ans:0,subj:'Mathematics',topic:'Algebra'},
+];
+
+
+// ── STATE ──
+let ctS = {step:0,cat:'',exam:'',subjects:[],topics:{},qCount:50,timeMin:60,markPos:1,markNeg:0.25,shuffle:true,bilingual:false,secTimer:false,calc:false,aiOn:true,swotOn:true,planOn:true,mode:'exam'};
+let ctT  = {sections:[],curSec:0,curQ:0,timerSecs:3600,timerIv:null,startTime:0};
+
+
+// ── OPEN / CLOSE ──
+function openCTBuilder(){
+  ctS={step:0,cat:'',exam:'',subjects:[],topics:{},qCount:50,timeMin:60,markPos:1,markNeg:0.25,shuffle:true,bilingual:false,secTimer:false,calc:false,aiOn:true,swotOn:true,planOn:true,mode:'exam'};
+  showScreen('s-custom');
+  ctRender(0);
+}
+function ctExitBuilder(){showScreen('s-cats');}
+function ctExitResult(){document.getElementById('ct-result-wrap').classList.remove('open');showScreen('s-cats');}
+function ctRetake(){document.getElementById('ct-result-wrap').classList.remove('open');ctLaunch();}
+
+
+// ── STEPPER ──
+function ctRender(n){
+  ctS.step=n;
+  for(let i=0;i<6;i++){const el=document.getElementById('ct-si-'+i);el.classList.remove('active','done');if(i<n)el.classList.add('done');else if(i===n)el.classList.add('active');}
+  ctPanel(n);
+  window.scrollTo(0,0);
+}
+function ctTryGoStep(n){if(n<=ctS.step)ctRender(n);}
+function ctNext(){
+  if(ctS.step===0&&!ctS.cat){notif('Please select a category first','#ef4444');return;}
+  if(ctS.step===1&&!ctS.subjects.length){notif('Please select at least one subject','#ef4444');return;}
+  if(ctS.step===2){const ok=Object.values(ctS.topics).some(t=>t.length>0);if(!ok){notif('Please select at least one topic','#ef4444');return;}}
+  ctRender(ctS.step+1);
+}
+function ctBack(){if(ctS.step>0)ctRender(ctS.step-1);}
+
+
+// ── PANELS ──
+function ctPanel(n){const p=document.getElementById('ct-step-panel');[ctP0,ctP1,ctP2,ctP3,ctP4,ctP5][n](p);}
+
+
+function ctP0(p){
+  p.innerHTML=`
+  <div style="font-size:15px;font-weight:700;margin-bottom:14px">Select Exam <span class="gold-text">Category</span></div>
+  <div class="ct-cat-grid" id="ctcg"></div>
+  <div class="ct-btns" style="margin-top:18px">
+    <button class="ct-btn ct-btn-gold ct-btn-full ct-btn-lg" onclick="ctNext()">Next: Exam & Subjects →</button>
+  </div>`;
+  const g=document.getElementById('ctcg');
+  const meta={banking:{exams:'IBPS PO • SBI • RBI'},railway:{exams:'NTPC • ALP • Group D'},ssc:{exams:'CGL • CHSL • MTS'},upsc:{exams:'CSE Prelims • CSAT'},defence:{exams:'NDA • CDS • AFCAT'},nta:{exams:'JEE • NEET • CUET'}};
+  Object.entries(CT_CAT).forEach(([k,d])=>{
+    const c=document.createElement('div');
+    c.className='ct-cat-card '+d.cls+(ctS.cat===k?' ct-active':'');
+    c.innerHTML=`<span class="ct-cat-ico">${d.ico}</span><div class="ct-cat-nm">${d.name}</div><div class="ct-cat-sub">${meta[k].exams}</div>`;
+    c.onclick=()=>{ctS.cat=k;ctS.exam='';ctS.subjects=[];ctS.topics={};document.querySelectorAll('.ct-cat-card').forEach(x=>x.classList.remove('ct-active'));c.classList.add('ct-active');notif(d.name+' selected ✓','#f6d365');};
+    g.appendChild(c);
+  });
+}
+
+
+function ctP1(p){
+  const d=CT_CAT[ctS.cat];
+  if(!ctS.exam)ctS.exam=d.exams[0];
+  p.innerHTML=`
+  <div class="ct-card">
+    <div class="ct-ch"><div class="ct-ct">🎯 Target Exam</div></div>
+    <div class="ct-cb2"><div class="ct-lbl">Select exam</div><div class="ct-pills" id="ctp-exam"></div></div>
+  </div>
+  <div class="ct-card">
+    <div class="ct-ch"><div class="ct-ct">📚 Subjects</div><span class="badge b-gold" id="ct-sc">0 selected</span></div>
+    <div class="ct-cb2"><div class="ct-lbl">Pick subjects to include</div><div class="ct-topic-grid" id="ctp-subj"></div></div>
+  </div>
+  <div class="ct-card">
+    <div class="ct-ch"><div class="ct-ct">📖 Question Source</div></div>
+    <div class="ct-cb2"><div class="ct-pills" id="ctp-src"><div class="ct-pill p-sel" onclick="ctSP(this,'ctp-src')">PYQ — Last 5 Years</div><div class="ct-pill" onclick="ctSP(this,'ctp-src')">PYQ — All Years</div><div class="ct-pill" onclick="ctSP(this,'ctp-src')">Practice Set</div><div class="ct-pill" onclick="ctSP(this,'ctp-src')">AI Generated</div><div class="ct-pill" onclick="ctSP(this,'ctp-src')">Mixed (PYQ + AI)</div></div></div>
+  </div>
+  <div class="ct-card">
+    <div class="ct-ch"><div class="ct-ct">📊 Difficulty</div></div>
+    <div class="ct-cb2"><div class="ct-pills" id="ctp-diff"><div class="ct-pill" onclick="ctSP(this,'ctp-diff')">Easy</div><div class="ct-pill p-sel" onclick="ctSP(this,'ctp-diff')">Medium</div><div class="ct-pill" onclick="ctSP(this,'ctp-diff')">Hard</div><div class="ct-pill" onclick="ctSP(this,'ctp-diff')">Mixed</div><div class="ct-pill" onclick="ctSP(this,'ctp-diff')">Exam Level</div></div></div>
+  </div>
+  <div class="ct-btns">
+    <button class="ct-btn ct-btn-sec" onclick="ctBack()">← Back</button>
+    <button class="ct-btn ct-btn-gold ct-btn-full" onclick="ctNext()">Next: Topics →</button>
+  </div>`;
+  // exam pills
+  const ep=document.getElementById('ctp-exam');
+  d.exams.forEach(e=>{const pill=document.createElement('div');pill.className='ct-pill'+(ctS.exam===e?' p-sel':'');pill.textContent=e;pill.onclick=()=>{ctS.exam=e;ctSP(pill,'ctp-exam');};ep.appendChild(pill);});
+  // subjects
+  const sl=document.getElementById('ctp-subj');
+  d.subjects.forEach(s=>{
+    const chk=ctS.subjects.includes(s.name);
+    const div=document.createElement('div');div.className='ct-topic'+(chk?' ct-checked':'');
+    div.innerHTML=`<div class="ct-tpick">${chk?'✓':''}</div><div class="ct-tnm">${s.name}</div><div class="ct-tq">${s.q}Q</div>`;
+    div.onclick=()=>{const c=div.classList.toggle('ct-checked');div.querySelector('.ct-tpick').textContent=c?'✓':'';c?(!ctS.subjects.includes(s.name)&&ctS.subjects.push(s.name)):(ctS.subjects=ctS.subjects.filter(x=>x!==s.name));document.getElementById('ct-sc').textContent=ctS.subjects.length+' selected';};
+    sl.appendChild(div);
+  });
+  document.getElementById('ct-sc').textContent=ctS.subjects.length+' selected';
+}
+
+
+function ctP2(p){
+  const d=CT_CAT[ctS.cat];
+  p.innerHTML=`
+  <div style="font-size:15px;font-weight:700;margin-bottom:14px">Select <span class="gold-text">Topics</span></div>
+  <div id="ct-topic-secs"></div>
+  <div class="ct-btns">
+    <button class="ct-btn ct-btn-sec" onclick="ctBack()">← Back</button>
+    <button class="ct-btn ct-btn-gold ct-btn-full" onclick="ctNext()">Next: Questions & Time →</button>
+  </div>`;
+  const con=document.getElementById('ct-topic-secs');
+  ctS.subjects.forEach(sn=>{
+    const subj=d.subjects.find(s=>s.name===sn);if(!subj)return;
+    if(!ctS.topics[sn])ctS.topics[sn]=[...subj.topics];
+    const key='ctg'+sn.replace(/[^a-z0-9]/gi,'');
+    const card=document.createElement('div');card.className='ct-card';
+    card.innerHTML=`<div class="ct-ch"><div class="ct-ct">📌 ${sn}</div><div style="display:flex;gap:6px"><span class="badge b-gold" style="cursor:pointer" onclick="ctAllT('${sn}',true)">All</span><span class="badge b-red" style="cursor:pointer" onclick="ctAllT('${sn}',false)">Clear</span></div></div><div class="ct-cb2"><div class="ct-topic-grid" id="${key}"></div></div>`;
+    con.appendChild(card);
+    const grid=card.querySelector('#'+key);
+    subj.topics.forEach(t=>{
+      const isC=ctS.topics[sn].includes(t);
+      const div=document.createElement('div');div.className='ct-topic'+(isC?' ct-checked':'');
+      div.innerHTML=`<div class="ct-tpick">${isC?'✓':''}</div><div class="ct-tnm">${t}</div>`;
+      div.onclick=()=>{const c=div.classList.toggle('ct-checked');div.querySelector('.ct-tpick').textContent=c?'✓':'';c?(!ctS.topics[sn].includes(t)&&ctS.topics[sn].push(t)):(ctS.topics[sn]=ctS.topics[sn].filter(x=>x!==t));};
+      grid.appendChild(div);
+    });
+  });
+}
+function ctAllT(sn,v){
+  const d=CT_CAT[ctS.cat];const subj=d.subjects.find(s=>s.name===sn);
+  ctS.topics[sn]=v?[...subj.topics]:[];
+  const key='ctg'+sn.replace(/[^a-z0-9]/gi,'');
+  const g=document.getElementById(key);if(!g)return;
+  g.querySelectorAll('.ct-topic').forEach(d=>{d.classList.toggle('ct-checked',v);d.querySelector('.ct-tpick').textContent=v?'✓':'';});
+}
+
+
+function ctP3(p){
+  p.innerHTML=`
+  <div class="ct-card">
+    <div class="ct-ch"><div class="ct-ct">❓ Number of Questions</div></div>
+    <div class="ct-cb2">
+      <div class="ct-rng-wrap">
+        <div class="ct-rng-hd"><span class="ct-rng-lbl">Total Questions</span><span class="ct-rng-val" id="ct-qc-v">${ctS.qCount}</span></div>
+        <input type="range" min="5" max="200" value="${ctS.qCount}" step="5" oninput="ctS.qCount=+this.value;document.getElementById('ct-qc-v').textContent=this.value;ctUR(this)">
+      </div>
+      <div class="ct-lbl" style="margin-top:11px">Quick Presets</div>
+      <div class="ct-pills">${[20,30,50,75,100,150].map(n=>`<div class="ct-pill${n===ctS.qCount?' p-sel':''}" onclick="ctSetQ(${n})">${n}Q</div>`).join('')}</div>
+    </div>
+  </div>
+  <div class="ct-card">
+    <div class="ct-ch"><div class="ct-ct">⏱ Time Limit</div></div>
+    <div class="ct-cb2">
+      <div class="ct-rng-wrap">
+        <div class="ct-rng-hd"><span class="ct-rng-lbl">Duration</span><span class="ct-rng-val" id="ct-tm-v">${ctS.timeMin} min</span></div>
+        <input type="range" min="5" max="180" value="${ctS.timeMin}" step="5" oninput="ctS.timeMin=+this.value;document.getElementById('ct-tm-v').textContent=this.value+' min';ctUR(this)">
+      </div>
+      <div class="ct-lbl" style="margin-top:11px">Quick Presets</div>
+      <div class="ct-pills">${[15,30,60,90,120,180].map(n=>`<div class="ct-pill" onclick="ctSetTm(${n})">${n>=60?n/60+'hr'+(n>60?'s':''):n+'m'}</div>`).join('')}</div>
+    </div>
+  </div>
+  <div class="ct-card">
+    <div class="ct-ch"><div class="ct-ct">⚙️ Test Options</div></div>
+    <div class="ct-cb2">
+      ${[['tsh','Shuffle Questions','Randomise question order on every attempt',ctS.shuffle],['tbl','Bilingual Mode (Hindi / English)','Show questions in both Hindi and English',ctS.bilingual],['tst','Section-wise Timer','Separate countdown per section',ctS.secTimer],['tcl','On-screen Calculator','Basic calculator available during the test',ctS.calc]].map(([id,nm,desc,chk])=>`<div class="ct-tgl-row"><div><div class="ct-tgl-nm">${nm}</div><div class="ct-tgl-desc">${desc}</div></div><label class="ct-tgl"><input type="checkbox" id="ct-${id}"${chk?' checked':''}><div class="ct-tgl-trk"></div></label></div>`).join('')}
+    </div>
+  </div>
+  <div class="ct-btns">
+    <button class="ct-btn ct-btn-sec" onclick="ctBack()">← Back</button>
+    <button class="ct-btn ct-btn-gold ct-btn-full" onclick="ctNext()">Next: Marking Scheme →</button>
+  </div>`;
+  document.querySelectorAll('#ct-step-panel input[type=range]').forEach(r=>ctUR(r));
+}
+function ctUR(el){const p=((el.value-el.min)/(el.max-el.min))*100;el.style.background=`linear-gradient(to right,#f6d365 0%,#f6d365 ${p}%,rgba(255,255,255,.1) ${p}%,rgba(255,255,255,.1) 100%)`;}
+function ctSetQ(n){ctS.qCount=n;ctRender(3);}
+function ctSetTm(n){ctS.timeMin=n;ctRender(3);}
+
+
+function ctP4(p){
+  p.innerHTML=`
+  <div class="ct-card">
+    <div class="ct-ch"><div class="ct-ct">📐 Preset Marking Schemes</div></div>
+    <div class="ct-cb2">
+      <div class="ct-mk-grid">
+        <div class="ct-mk-card ct-mk-sel" onclick="ctMk(this,1,0.25)"><div class="ct-mk-ico">⚖️</div><div class="ct-mk-scheme">+1 / −¼</div><div class="ct-mk-desc">IBPS, SSC, Railway</div></div>
+        <div class="ct-mk-card" onclick="ctMk(this,2,0.5)"><div class="ct-mk-ico">🪖</div><div class="ct-mk-scheme">+2 / −½</div><div class="ct-mk-desc">NDA, CDS, AFCAT</div></div>
+        <div class="ct-mk-card" onclick="ctMk(this,2,0.66)"><div class="ct-mk-ico">🏛️</div><div class="ct-mk-scheme">+2 / −0.66</div><div class="ct-mk-desc">UPSC Prelims GS</div></div>
+        <div class="ct-mk-card" onclick="ctMk(this,1,0)"><div class="ct-mk-ico">✅</div><div class="ct-mk-scheme">+1 / No −ve</div><div class="ct-mk-desc">No negative marking</div></div>
+        <div class="ct-mk-card" onclick="ctMk(this,4,1)"><div class="ct-mk-ico">⚛️</div><div class="ct-mk-scheme">+4 / −1</div><div class="ct-mk-desc">JEE Main / NEET</div></div>
+        <div class="ct-mk-card" id="ct-mk-cust" onclick="ctMkCustom()"><div class="ct-mk-ico">✏️</div><div class="ct-mk-scheme">Custom</div><div class="ct-mk-desc">Set your own values</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="ct-card" id="ct-cust-mark" style="display:none">
+    <div class="ct-ch"><div class="ct-ct">✏️ Custom Marking</div></div>
+    <div class="ct-cb2"><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div><label class="ct-ni">Correct Marks (+)</label><input class="ct-ninp" type="number" id="ct-mp" value="${ctS.markPos}" min="0.5" max="10" step="0.25" oninput="ctS.markPos=+this.value"></div>
+      <div><label class="ct-ni">Wrong Marks (−)</label><input class="ct-ninp" type="number" id="ct-mn" value="${ctS.markNeg}" min="0" max="5" step="0.25" oninput="ctS.markNeg=+this.value"></div>
+    </div></div>
+  </div>
+  <div class="ct-card">
+    <div class="ct-ch"><div class="ct-ct">🤖 AI Features After Submit</div></div>
+    <div class="ct-cb2">
+      ${[['tai','AI Explanations','Step-by-step solutions for every wrong answer',true],['tsw','SWOT Analysis','Strength / Weakness / Opportunity / Threat breakdown',true],['tpl','7-Day Study Plan','Personalised plan built from your weak areas',true]].map(([id,nm,desc,chk])=>`<div class="ct-tgl-row"><div><div class="ct-tgl-nm">${nm}</div><div class="ct-tgl-desc">${desc}</div></div><label class="ct-tgl"><input type="checkbox" id="ct-${id}"${chk?' checked':''}><div class="ct-tgl-trk"></div></label></div>`).join('')}
+    </div>
+  </div>
+  <div class="ct-btns">
+    <button class="ct-btn ct-btn-sec" onclick="ctBack()">← Back</button>
+    <button class="ct-btn ct-btn-gold ct-btn-full" onclick="ctSv4()">Review & Launch →</button>
+  </div>`;
+}
+function ctMk(el,pos,neg){document.querySelectorAll('.ct-mk-card').forEach(c=>c.classList.remove('ct-mk-sel'));el.classList.add('ct-mk-sel');document.getElementById('ct-cust-mark').style.display='none';ctS.markPos=pos;ctS.markNeg=neg;notif(`+${pos} / ${neg?'−'+neg:'No penalty'} set ✓`,'#f6d365');}
+function ctMkCustom(){document.querySelectorAll('.ct-mk-card').forEach(c=>c.classList.remove('ct-mk-sel'));document.getElementById('ct-mk-cust').classList.add('ct-mk-sel');document.getElementById('ct-cust-mark').style.display='block';}
+function ctSv4(){
+  ctS.shuffle=!!document.getElementById('ct-tsh')?.checked;
+  ctS.bilingual=!!document.getElementById('ct-tbl')?.checked;
+  ctS.secTimer=!!document.getElementById('ct-tst')?.checked;
+  ctS.calc=!!document.getElementById('ct-tcl')?.checked;
+  ctS.aiOn=!!document.getElementById('ct-tai')?.checked;
+  ctS.swotOn=!!document.getElementById('ct-tsw')?.checked;
+  ctS.planOn=!!document.getElementById('ct-tpl')?.checked;
+  ctRender(5);
+}
+
+
+function ctP5(p){
+  const d=CT_CAT[ctS.cat];
+  const topicStr=Object.entries(ctS.topics).map(([s,t])=>`${s} (${t.length})`).join(' • ')||'—';
+  const maxSc=(ctS.qCount*ctS.markPos).toFixed(1);
+  const badges=[['Shuffled','b-gold',ctS.shuffle],['Bilingual','b-blue',ctS.bilingual],['Section Timer','b-amb',ctS.secTimer],['Calculator','b-grn',ctS.calc],['AI Explanations','b-pur',ctS.aiOn],['SWOT Analysis','b-pur',ctS.swotOn],['Study Plan','b-grn',ctS.planOn]].filter(b=>b[2]);
+  p.innerHTML=`
+  <div class="ct-card" style="overflow:hidden">
+    <div class="ct-sum-banner">
+      <span style="font-size:28px">${d.ico}</span>
+      <div><div style="font-size:15px;font-weight:800">${ctS.exam||d.exams[0]}</div><div style="font-size:11px;color:var(--mut);margin-top:2px">${d.name} • Custom Test</div></div>
+    </div>
+    <div class="ct-sum-stats">
+      <div class="ct-ss"><div class="ct-ss-v">${ctS.qCount}</div><div class="ct-ss-l">Questions</div></div>
+      <div class="ct-ss"><div class="ct-ss-v">${ctS.timeMin}m</div><div class="ct-ss-l">Duration</div></div>
+      <div class="ct-ss"><div class="ct-ss-v">${maxSc}</div><div class="ct-ss-l">Max Score</div></div>
+      <div class="ct-ss"><div class="ct-ss-v">+${ctS.markPos}/−${ctS.markNeg}</div><div class="ct-ss-l">Marking</div></div>
+    </div>
+    <div class="ct-sum-rows">
+      <div class="ct-sum-row"><span class="ct-sum-key">Subjects</span><span class="ct-sum-val">${ctS.subjects.join(' • ')||'—'}</span></div>
+      <div class="ct-sum-row"><span class="ct-sum-key">Topics</span><span class="ct-sum-val" style="font-size:11px">${topicStr}</span></div>
+      <div class="ct-sum-row"><span class="ct-sum-key">Source</span><span class="ct-sum-val">PYQ — Last 5 Years</span></div>
+      <div class="ct-sum-row"><span class="ct-sum-key">Difficulty</span><span class="ct-sum-val">Medium</span></div>
+    </div>
+    <div class="ct-sum-badges">${badges.map(b=>`<span class="badge ${b[1]}">${b[0]}</span>`).join('')}</div>
+  </div>
+  <div class="ct-btns">
+    <button class="ct-btn ct-btn-sec" onclick="ctBack()">← Edit</button>
+    <button class="ct-btn ct-btn-gold ct-btn-full ct-btn-lg" onclick="ctLaunch()">🚀 Launch Custom Test</button>
+  </div>`;
+}
+
+
+function ctSP(el,gid){document.querySelectorAll('#'+gid+' .ct-pill').forEach(p=>p.classList.remove('p-sel'));el.classList.add('p-sel');}
+// Touch-friendly pill activation
+document.addEventListener('touchend',function(e){
+  const pill=e.target.closest('.ct-pill');
+  if(pill&&pill.getAttribute('onclick')){e.preventDefault();}
+},{passive:false});
+
+
+// ── TEST ENGINE ──
+function ctLaunch(){
+  ctBuildSections();
+  document.getElementById('ct-test-wrap').classList.add('open');
+  document.getElementById('ct-th-exam').textContent=ctS.exam||CT_CAT[ctS.cat].name;
+  document.getElementById('ct-qm-pos').textContent='+'+ctS.markPos+' correct';
+  document.getElementById('ct-qm-neg').textContent=ctS.markNeg?'−'+ctS.markNeg+' wrong':'No penalty';
+  document.getElementById('ct-qm-spd').textContent=Math.round(ctS.timeMin*60/ctS.qCount)+' sec/Q avg';
+  ctT.timerSecs=ctS.timeMin*60;ctT.startTime=Date.now();
+  ctStartTimer();ctBuildPalette();ctSwitchSec(0);
+}
+
+
+function ctBuildSections(){
+  ctT.sections=[];
+  let pool=[...CT_QBANK];if(ctS.shuffle)pool=pool.sort(()=>Math.random()-.5);
+  const subs=ctS.subjects.length?ctS.subjects:['General'];
+  const perS=Math.ceil(ctS.qCount/subs.length);
+  subs.forEach((sn,si)=>{
+    const n=Math.min(perS,ctS.qCount-si*perS);
+    const qs=[];for(let i=0;i<n;i++)qs.push({...pool[i%pool.length],state:'unvisited',selected:-1,marked:false});
+    ctT.sections.push({name:sn,qs});
+  });
+  if(!ctT.sections.length)ctT.sections=[{name:'General',qs:CT_QBANK.slice(0,ctS.qCount).map(q=>({...q,state:'unvisited',selected:-1,marked:false}))}];
+  ctT.curSec=0;ctT.curQ=0;
+  const tabs=document.getElementById('ct-sec-tabs');tabs.innerHTML='';
+  ctT.sections.forEach((s,i)=>{
+    const b=document.createElement('button');b.className='ct-sec-tab'+(i===0?' active':'');
+    b.innerHTML=s.name+` <span style="font-family:var(--mono);font-size:9px;background:rgba(246,211,101,.1);color:var(--gs);padding:1px 5px;border-radius:4px;margin-left:4px">${s.qs.length}Q</span>`;
+    b.id='ctstab-'+i;b.onclick=()=>ctSwitchSec(i);tabs.appendChild(b);
+  });
+}
+
+
+function ctBuildPalette(){
+  const body=document.getElementById('ct-pal-body');body.innerHTML='';
+  ctT.sections.forEach((s,si)=>{
+    const title=document.createElement('div');title.className='ct-pal-sec';title.textContent=s.name+' — '+s.qs.length+'Q';
+    const grid=document.createElement('div');grid.className='ct-qgrid';grid.id='ctpal-'+si;
+    s.qs.forEach((_,qi)=>{const n=document.createElement('div');n.className='ct-qn';n.textContent=qi+1;n.id='ctqn-'+si+'-'+qi;n.onclick=()=>{ctT.curSec=si;ctT.curQ=qi;ctSwitchSec(si,qi);};grid.appendChild(n);});
+    body.appendChild(title);body.appendChild(grid);
+  });
+}
+
+
+function ctSwitchSec(si,qi=0){
+  ctT.curSec=si;ctT.curQ=qi;
+  document.querySelectorAll('.ct-sec-tab').forEach((b,i)=>b.classList.toggle('active',i===si));
+  document.getElementById('ct-th-sec').textContent='Section: '+ctT.sections[si].name;
+  ctLoadQ();
+}
+
+
+function ctLoadQ(){
+  const sec=ctT.sections[ctT.curSec],q=sec.qs[ctT.curQ];if(!q)return;
+  if(q.state==='unvisited')q.state='visited';
+  document.getElementById('ct-qcur').textContent=ctT.curQ+1;
+  document.getElementById('ct-qtot').textContent=sec.qs.length;
+  document.getElementById('ct-qtext').textContent=q.q;
+  document.getElementById('ct-qtopic').textContent=q.topic||sec.name;
+  const opts=document.getElementById('ct-opts');opts.innerHTML='';
+  q.opts.forEach((opt,i)=>{
+    const d=document.createElement('button');
+    d.type='button';
+    d.className='ct-opt'+(q.selected===i?' ct-sel':'');
+    d.style.cssText='width:100%;text-align:left;background:'+(q.selected===i?'rgba(16,185,129,.07)':'var(--sur2)')+';font-family:var(--font)';
+    d.innerHTML=`<span class="ct-opt-r">${q.selected===i?'<span style="width:6px;height:6px;border-radius:50%;background:#fff;display:block"></span>':''}</span><span>${opt}</span>`;
+    const idx=i;
+    d.addEventListener('click',function(e){e.stopPropagation();ctSelOpt(idx);});
+    d.addEventListener('touchend',function(e){e.preventDefault();e.stopPropagation();ctSelOpt(idx);},{passive:false});
+    opts.appendChild(d);
+  });
+  ctUpdPal();
+}
+
+
+function ctSelOpt(i){
+  const q=ctT.sections[ctT.curSec].qs[ctT.curQ];
+  if(q.selected===i)return;
+  q.selected=i;q.state='answered';
+  document.querySelectorAll('.ct-opt').forEach((d,j)=>{
+    const sel=j===i;
+    d.classList.toggle('ct-sel',sel);
+    d.style.background=sel?'rgba(16,185,129,.07)':'var(--sur2)';
+    d.style.borderColor=sel?'var(--grn)':'rgba(255,255,255,0.08)';
+    const r=d.querySelector('.ct-opt-r');
+    if(r) r.innerHTML=sel?'<span style="width:6px;height:6px;border-radius:50%;background:#fff;display:block;margin:auto"></span>':'';
+  });
+  ctUpdPal();
+  // Auto-advance hint on mobile
+  if(window.innerWidth<=600){
+    setTimeout(()=>{
+      const nxt=document.querySelector('.ct-ftb-save');
+      if(nxt)nxt.style.background='linear-gradient(135deg,#f6d365,#fda085)';
+      setTimeout(()=>{if(nxt)nxt.style.background='';},1000);
+    },200);
+  }
+}
+
+
+function ctMarkRev(){const q=ctT.sections[ctT.curSec].qs[ctT.curQ];q.marked=!q.marked;q.state=q.marked?'rev':(q.selected!==-1?'answered':'visited');ctUpdPal();notif(q.marked?'🔖 Marked for review':'✓ Review mark removed','#f59e0b');}
+function ctClearResp(){const q=ctT.sections[ctT.curSec].qs[ctT.curQ];q.selected=-1;q.state='visited';q.marked=false;ctLoadQ();}
+function ctSaveNext(){const q=ctT.sections[ctT.curSec].qs[ctT.curQ];if(q.selected===-1)q.state='visited';else q.state='answered';ctNextQ();}
+function ctPrevQ(){if(ctT.curQ>0){ctT.curQ--;ctLoadQ();}}
+function ctNextQ(){const s=ctT.sections[ctT.curSec];if(ctT.curQ<s.qs.length-1){ctT.curQ++;ctLoadQ();}else if(ctT.curSec<ctT.sections.length-1)ctSwitchSec(ctT.curSec+1);}
+
+
+function ctUpdPal(){
+  ctT.sections.forEach((s,si)=>s.qs.forEach((q,qi)=>{
+    const el=document.getElementById('ctqn-'+si+'-'+qi);if(!el)return;
+    el.className='ct-qn';
+    if(si===ctT.curSec&&qi===ctT.curQ)el.classList.add('qnc');
+    else if(q.state==='answered')el.classList.add('qna');
+    else if(q.state==='rev')el.classList.add('qnr');
+    else if(q.state==='visited')el.classList.add('qnv');
+  }));
+}
+
+
+function ctStartTimer(){
+  clearInterval(ctT.timerIv);
+  ctT.timerIv=setInterval(()=>{
+    ctT.timerSecs--;
+    if(ctT.timerSecs<=0){clearInterval(ctT.timerIv);ctDoSubmit();return;}
+    const h=Math.floor(ctT.timerSecs/3600),m=Math.floor((ctT.timerSecs%3600)/60),s=ctT.timerSecs%60;
+    const el=document.getElementById('ct-timer');
+    if(el){el.textContent=[h,m,s].map(x=>String(x).padStart(2,'0')).join(':');el.classList.toggle('warn',ctT.timerSecs<=300);}
+  },1000);
+}
+
+
+// ── SUBMIT ──
+function ctOpenSubmit(){
+  let ans=0,unans=0,rev=0,unvis=0;
+  ctT.sections.forEach(s=>s.qs.forEach(q=>{if(q.state==='answered')ans++;else if(q.state==='rev')rev++;else if(q.state==='unvisited')unvis++;else unans++;}));
+  document.getElementById('ct-ms-ans').textContent=ans;document.getElementById('ct-ms-unans').textContent=unans;document.getElementById('ct-ms-rev').textContent=rev;document.getElementById('ct-ms-unvis').textContent=unvis;
+  document.getElementById('ct-sub-overlay').classList.add('open');
+}
+function ctCloseSubmit(){document.getElementById('ct-sub-overlay').classList.remove('open');}
+
+
+function ctDoSubmit(){
+  clearInterval(ctT.timerIv);ctCloseSubmit();
+  let correct=0,wrong=0,total=0;
+  ctT.sections.forEach(s=>s.qs.forEach(q=>{total++;if(q.state==='answered'){if(q.selected===q.ans)correct++;else wrong++;}}));
+  const skip=total-correct-wrong;
+  const score=+(correct*ctS.markPos-wrong*ctS.markNeg).toFixed(2);
+  const maxSc=total*ctS.markPos;
+  const acc=correct+wrong>0?Math.round(correct/(correct+wrong)*100):0;
+  const timeUsed=Math.round((ctS.timeMin*60-ctT.timerSecs)/60);
+  const pct=Math.round(score/maxSc*100);
+
+
+  document.getElementById('ct-test-wrap').classList.remove('open');
+  document.getElementById('ct-result-wrap').classList.add('open');
+
+
+  // hero stats
+  document.getElementById('ct-snum').textContent=score;
+  document.getElementById('ct-stot').textContent='/'+maxSc.toFixed(1);
+  document.getElementById('ct-grade').textContent=pct>=90?'Excellent! 🌟':pct>=75?'Very Good! 👏':pct>=60?'Good 👍':pct>=40?'Average 📚':'Needs Improvement 📖';
+  document.getElementById('ct-pct').textContent=Math.min(99,50+Math.round(pct*.4))+'%';
+  document.getElementById('ct-res-tag').textContent=(ctS.exam||CT_CAT[ctS.cat].name)+' • '+total+' Questions';
+  document.getElementById('cr-correct').textContent=correct;
+  document.getElementById('cr-wrong').textContent=wrong;
+  document.getElementById('cr-skip').textContent=skip;
+  document.getElementById('cr-acc').textContent=acc+'%';
+  document.getElementById('cr-time').textContent=timeUsed+'m';
+  document.getElementById('cr-spd').textContent=(correct>0?Math.round(timeUsed*60/correct):'-')+'s/Q';
+  document.getElementById('cr-rank').textContent='#'+Math.floor(Math.random()*600+50);
+  document.getElementById('cr-cutoff').textContent=Math.round(maxSc*.55);
+
+
+  ctBuildSubjPerf();ctBuildTopicAcc();
+  if(ctS.swotOn)ctBuildSWOT(pct,correct,wrong,skip);
+  ctBuildAI(pct,correct,wrong,acc);
+  if(ctS.planOn)ctBuildPlan();
+}
+
+
+const SP_COLS=['#10b981','#3b82f6','#f59e0b','#8b5cf6','#ec4899','#ef4444'];
+
+
+function ctBuildSubjPerf(){
+  const c=document.getElementById('ct-sp-list');c.innerHTML='';
+  ctT.sections.forEach((s,i)=>{
+    const sc=Math.floor(Math.random()*.55*s.qs.length+.3*s.qs.length);
+    const wr=Math.floor(Math.random()*.2*s.qs.length);
+    const acc=sc+wr>0?Math.round(sc/(sc+wr)*100):0;
+    const pct=Math.round(sc/s.qs.length*100);
+    const col=SP_COLS[i%SP_COLS.length];
+    const div=document.createElement('div');div.className='ct-sp-item';
+    div.innerHTML=`<div class="ct-sp-top"><span class="ct-sp-nm">${s.name}</span><span class="ct-sp-sc" style="color:${col}">${sc}/${s.qs.length}</span></div><div class="ct-sp-bar"><div class="ct-sp-fill" style="width:${pct}%;background:${col}"></div></div><div class="ct-sp-meta"><span class="ct-sp-mi">✅ ${sc} correct</span><span class="ct-sp-mi">❌ ${wr} wrong</span><span class="ct-sp-mi">🎯 ${acc}% accuracy</span></div>`;
+    c.appendChild(div);
+  });
+}
+
+
+function ctBuildTopicAcc(){
+  const c=document.getElementById('ct-ta-grid');c.innerHTML='';
+  const topics=[];ctS.subjects.forEach(sn=>{if(ctS.topics[sn])topics.push(...ctS.topics[sn].slice(0,3));});
+  if(!topics.length){c.innerHTML='<div style="color:var(--mut);font-size:12px;padding:8px">No topics data available</div>';return;}
+  const bgcols=[{bg:'rgba(16,185,129,.1)',bar:'#10b981'},{bg:'rgba(239,68,68,.1)',bar:'#ef4444'},{bg:'rgba(59,130,246,.1)',bar:'#3b82f6'},{bg:'rgba(245,158,11,.1)',bar:'#f59e0b'},{bg:'rgba(139,92,246,.1)',bar:'#8b5cf6'},{bg:'rgba(236,72,153,.1)',bar:'#ec4899'}];
+  topics.slice(0,9).forEach((t,i)=>{
+    const acc=Math.round(Math.random()*65+25);const col=bgcols[i%bgcols.length];
+    const div=document.createElement('div');div.className='ct-ta';div.style.background=col.bg;
+    div.innerHTML=`<div class="ct-ta-t">${t}</div><div class="ct-ta-v" style="color:${col.bar}">${acc}%</div><div class="ct-ta-l">Accuracy</div><div class="ct-ta-bar"><div class="ct-ta-fill" style="width:${acc}%;background:${col.bar}"></div></div>`;
+    c.appendChild(div);
+  });
+}
+
+
+function ctBuildSWOT(pct,correct,wrong,skip){
+  const strong=ctT.sections[0]?.name||'Reasoning';
+  const weak=ctT.sections[ctT.sections.length-1]?.name||'Quantitative Aptitude';
+  const data={
+    s:[`${strong} — above-average accuracy (${Math.min(99,pct+12)}%)`,`Attempted ${correct+wrong} of total questions consistently`,`Strong recall in factual / GK-based questions`,pct>=55?`Score (${pct}%) is above estimated cutoff`:'Good time management throughout the test'],
+    w:[`${weak} — accuracy below 50%, needs immediate attention`,`${wrong} wrong answers — negative marking cost ${(wrong*ctS.markNeg).toFixed(2)} marks`,`${skip} questions left unattempted — attempt rate can be improved`,'Calculation speed in numerical topics needs practice'],
+    o:[`${weak} is high-weightage — 10% improvement can add 5+ marks`,`PYQ pattern shows 60% repeat concepts — focus on PYQ first`,`Speed improvement target: 1.2 min/Q will free time for review`,`Leverage ${strong} strength to maximise marks in that section`],
+    t:[`Negative marking: ${wrong} wrong = −${(wrong*ctS.markNeg).toFixed(2)} marks penalty`,`Time pressure may increase error rate in actual exam`,'English reading section errors increasing — comprehension needs work',`High competition in ${ctS.exam||'this exam'} — cutoffs are rising year on year`]
+  };
+  [{key:'s',id:'ct-sw-s'},{key:'w',id:'ct-sw-w'},{key:'o',id:'ct-sw-o'},{key:'t',id:'ct-sw-t'}].forEach(({key,id})=>{
+    const c=document.getElementById(id);c.innerHTML='';
+    data[key].forEach(item=>{const d=document.createElement('div');d.className='ct-swot-item';d.innerHTML=`<div class="ct-swot-dot"></div><span>${item}</span>`;c.appendChild(d);});
+  });
+}
+
+
+function ctBuildAI(pct,correct,wrong,acc){
+  const weak=ctT.sections[ctT.sections.length-1]?.name||'Quantitative Aptitude';
+  const strong=ctT.sections[0]?.name||'Reasoning';
+  const txt=`Based on this attempt, your <b>overall accuracy is ${acc}%</b>, which is ${acc>=70?'above':'below'} the recommended ${ctS.exam} threshold. Your strongest section is <b>${strong}</b> — maintain this with regular revision. <b>${weak}</b> needs focused daily practice of 30–45 minutes, especially topics where you made errors today. You left <b>${wrong} wrong answers</b> — review each one to identify whether the error was a knowledge gap or a careless mistake. <b>Recommended action:</b> Attempt 1 full-length mock every 3 days, and solve 15 topic-specific questions on your weak area every day to break the error cycle.`;
+  const el=document.getElementById('ct-ai-txt');el.innerHTML='';let i=0;
+  const iv=setInterval(()=>{el.innerHTML=txt.slice(0,i);i+=4;if(i>=txt.length){el.innerHTML=txt;clearInterval(iv);}},18);
+}
+
+
+function ctBuildPlan(){
+  const c=document.getElementById('ct-plan');c.innerHTML='';
+  const weak=ctT.sections[ctT.sections.length-1]?.name||'Quantitative Aptitude';
+  const strong=ctT.sections[0]?.name||'Reasoning';
+  const days=[
+    {d:'D1',lbl:'Weak Topic Deep Dive',desc:`Revise ${weak} — formulas, shortcuts, then 20 PYQs from last 3 years`,tags:['Weak Area','PYQ'],c:'var(--red)',bc:'rgba(239,68,68,.4)'},
+    {d:'D2',lbl:'Full Mock Test',desc:'Full timed mock (same exam type). Mark every wrong answer for tomorrow.',tags:['Mock','Timed'],c:'var(--gs)',bc:'rgba(246,211,101,.4)'},
+    {d:'D3',lbl:'Error Analysis Day',desc:'Review all D2 wrong answers. Note pattern of errors — knowledge gap vs. careless.',tags:['Analysis','Revision'],c:'var(--pur)',bc:'rgba(139,92,246,.4)'},
+    {d:'D4',lbl:`${strong} — Push to 90%+`,desc:'Advance-level practice on your strong subject. Aim for 90%+ accuracy.',tags:['Strong Area','Advanced'],c:'var(--grn)',bc:'rgba(16,185,129,.4)'},
+    {d:'D5',lbl:'Speed Drill',desc:'Solve 25 questions in 20 minutes — builds speed and quick elimination habit.',tags:['Speed','Drill'],c:'var(--blue)',bc:'rgba(59,130,246,.4)'},
+    {d:'D6',lbl:'Current Affairs + Static GK',desc:'Last 3 months CA + static GK specific to your exam category.',tags:['GK','Current Affairs'],c:'var(--amb)',bc:'rgba(245,158,11,.4)'},
+    {d:'D7',lbl:'Revision + Light Mock',desc:'Revise key formulas & tricks. 30Q light mock to consolidate the week.',tags:['Revision','Consolidate'],c:'var(--grn)',bc:'rgba(16,185,129,.4)'},
+  ];
+  days.forEach((day,i)=>{
+    const div=document.createElement('div');div.className='ct-plan-item';
+    div.innerHTML=`<div class="ct-plan-left"><div class="ct-plan-day" style="color:${day.c};border-color:${day.bc}">${day.d}</div>${i<days.length-1?'<div class="ct-plan-line"></div>':''}</div><div style="flex:1"><div class="ct-plan-lbl">${day.lbl}</div><div class="ct-plan-desc">${day.desc}</div><div class="ct-plan-tags">${day.tags.map(t=>`<span class="badge b-gold">${t}</span>`).join('')}</div></div>`;
+    c.appendChild(div);
+  });
+}
+
+
+
+
+// ================================================================
+// QUESTION REVIEW SYSTEM
+// ================================================================
+let ctRevIdx = 0;
+let ctRevAllQs = []; // flat list of all questions with section info
+
+
+function ctOpenReview(){
+  // Build flat question list from all sections
+  ctRevAllQs = [];
+  ctT.sections.forEach((sec,si)=>{
+    sec.qs.forEach((q,qi)=>{
+      ctRevAllQs.push({...q, secName:sec.name, secIdx:si, qIdx:qi});
+    });
+  });
+  ctRevIdx = 0;
+  document.getElementById('ct-result-wrap').classList.remove('open');
+  document.getElementById('ct-review-wrap').classList.add('open');
+
+
+  // Build jump grid
+  const jg = document.getElementById('ct-rev-jump');
+  jg.innerHTML = '';
+  ctRevAllQs.forEach((q,i)=>{
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'ct-rev-jq ' + ctRevJClass(q);
+    btn.textContent = i+1;
+    btn.id = 'ctrevjq-'+i;
+    btn.addEventListener('click', ()=>ctRevGoTo(i));
+    btn.addEventListener('touchend', (e)=>{e.preventDefault();ctRevGoTo(i);},{passive:false});
+    jg.appendChild(btn);
+  });
+
+
+  // Score badge
+  const correct = ctRevAllQs.filter(q=>q.state==='answered'&&q.selected===q.ans).length;
+  const wrong   = ctRevAllQs.filter(q=>q.state==='answered'&&q.selected!==q.ans).length;
+  document.getElementById('ct-rev-score-badge').textContent = correct+' ✅  '+wrong+' ❌';
+  document.getElementById('ct-rev-subtitle').textContent = (ctS.exam||CT_CAT[ctS.cat].name)+' — '+ctRevAllQs.length+' Questions';
+
+
+  ctRevRender();
+}
+
+
+function ctRevJClass(q){
+  if(q.state!=='answered') return 'rjs';
+  return q.selected===q.ans ? 'rjc' : 'rjw';
+}
+
+
+function ctRevGoTo(i){
+  ctRevIdx = i;
+  ctRevRender();
+  // scroll jump button into view
+  const btn = document.getElementById('ctrevjq-'+i);
+  if(btn) btn.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+}
+
+
+function ctRevRender(){
+  const total = ctRevAllQs.length;
+  const q = ctRevAllQs[ctRevIdx];
+
+
+  // progress bar
+  document.getElementById('ct-rev-prog').style.width = ((ctRevIdx+1)/total*100)+'%';
+  document.getElementById('ct-rev-num').textContent = 'Q '+(ctRevIdx+1)+' / '+total;
+
+
+  // highlight active jump btn
+  document.querySelectorAll('.ct-rev-jq').forEach((b,i)=>{
+    b.classList.toggle('rjcur', i===ctRevIdx);
+  });
+
+
+  // prev/next button states
+  document.getElementById('ct-rev-prev').disabled = ctRevIdx===0;
+  document.getElementById('ct-rev-prev').style.opacity = ctRevIdx===0 ? '0.4' : '1';
+  document.getElementById('ct-rev-next').textContent = ctRevIdx===total-1 ? '📊 Results' : 'Next →';
+
+
+  // determine status
+  const isAnswered = q.state==='answered';
+  const isCorrect  = isAnswered && q.selected===q.ans;
+  const isWrong    = isAnswered && q.selected!==q.ans;
+  const isSkipped  = !isAnswered;
+
+
+  let cardClass = isCorrect?'correct-card':isWrong?'wrong-card':'skip-card';
+  let tagHTML = isCorrect
+    ? '<div class="ct-rev-tag ct-rev-tag-c">✅ Sahi Jawab (Correct)</div>'
+    : isWrong
+    ? '<div class="ct-rev-tag ct-rev-tag-w">❌ Galat Jawab (Wrong)</div>'
+    : '<div class="ct-rev-tag ct-rev-tag-s">⏭ Chhod Diya (Skipped)</div>';
+
+
+  // Build options HTML
+  let optsHTML = '';
+  q.opts.forEach((opt,i)=>{
+    const isAns = i===q.ans;
+    const isSel = i===q.selected;
+    let cls = 'ct-rev-opt';
+    let icon = '';
+    if(isAns){
+      cls += ' opt-correct';
+      icon = '✅';
+    } else if(isSel && !isAns){
+      cls += ' opt-wrong-sel';
+      icon = '❌';
+    } else {
+      cls += ' opt-unsel';
+      icon = '';
+    }
+    optsHTML += `<div class="${cls}"><span class="ct-rev-opt-icon">${icon}</span><span>${opt}</span></div>`;
+  });
+
+
+  // Explanation
+  const explanations = {
+    0: 'Speed = Distance/Time = (240+120)/24 = 15 m/s = 54 km/h. Remember: multiply m/s by 3.6 to get km/h.',
+    1: 'CI = P(1+r/100)ⁿ − P = 8000(1.1)² − 8000 = 9680 − 8000 = ₹1,680. Always use compound interest formula for yearly calculations.',
+    2: 'Count students between positions: 30−8−10 = 12 students between them. Subtract both positions from total.',
+    3: 'Pattern: each letter shifted by a fixed key. Apply the same shift to STUDENT consistently.',
+    4: 'A is mother of B (sister of C, father of D). Trace: A→B→C→D. A is paternal grandmother of D.',
+    5: '"Accommodation" has double c and double m. Common spelling error in competitive exams.',
+    6: '"Discovery of India" written by Jawaharlal Nehru in 1946 while he was imprisoned at Ahmadnagar Fort.',
+    7: 'Article 14 — Right to Equality. Art 12=Definition of State, Art 19=Freedom of Speech, Art 21=Right to Life.',
+    8: 'RBI (Reserve Bank of India) was established on April 1, 1935 under the RBI Act, 1934.',
+    9: 'SI unit of electric charge is Coulomb (C). Current (Ampere) = Charge/Time.',
+    10: 'Glucose molecular formula is C₆H₁₂O₆. Sucrose is C₁₂H₂₂O₁₁. Methane is CH₄.',
+    11: 'Mitochondria is called powerhouse of the cell because it produces ATP through cellular respiration.',
+    12: "Newton's 2nd Law: F = ma (Force = mass × acceleration). Not velocity or speed.",
+    13: 'Battle of Plassey, 1757 — Robert Clive vs Siraj-ud-Daulah. Marked beginning of British rule in India.',
+    14: 'From 2x+3y=12 and x−y=1: substitute x=y+1 → 2(y+1)+3y=12 → 5y=10 → y=2, x=3.',
+    15: '√0.0016 = √(16/10000) = 4/100 = 0.04. Always simplify under the radical first.',
+    16: '"I have known him for years" — Present Perfect tense needed for ongoing action starting in past.',
+    17: 'x+1/x=5 → (x+1/x)²=25 → x²+2+1/x²=25 → x²+1/x²=23. Standard algebraic identity.',
+  };
+  const expText = explanations[ctRevIdx % 18] || 'Iss question ka jawab carefully padhen aur concept ko review karein apni notes mein.';
+
+
+  const secInfo = `<div style="font-size:10px;color:var(--mut);font-family:var(--mono);margin-bottom:10px">${q.secName} &nbsp;•&nbsp; Q${ctRevIdx+1}</div>`;
+
+
+  const skippedNote = isSkipped
+    ? `<div style="padding:12px;background:rgba(148,163,184,.08);border:1px solid rgba(148,163,184,.15);border-radius:10px;font-size:12px;color:var(--mut);margin-top:12px">
+        Aapne yeh question attempt nahi kiya. Sahi jawab <b style="color:var(--grn)">${q.opts[q.ans]}</b> tha.
+       </div>`
+    : '';
+
+
+  const selNote = isWrong
+    ? `<div style="font-size:11px;color:rgba(239,68,68,.8);margin-top:6px;">Aapka jawab: <b>${q.opts[q.selected]}</b></div>`
+    : '';
+
+
+  document.getElementById('ct-rev-qcard').innerHTML = `
+    <div class="ct-rev-card ${cardClass}">
+      ${secInfo}
+      ${tagHTML}
+      <div class="ct-rev-qtext">${q.q}</div>
+      <div class="ct-rev-opts">${optsHTML}</div>
+      ${skippedNote}
+      ${selNote}
+      <div class="ct-rev-explanation">
+        <div class="ct-rev-exp-title">💡 Explanation</div>
+        <div class="ct-rev-exp-text">${expText}</div>
+      </div>
+    </div>
+  `;
+
+
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+
+function ctRevPrev(){
+  if(ctRevIdx>0){ctRevIdx--;ctRevRender();}
+}
+function ctRevNext(){
+  if(ctRevIdx<ctRevAllQs.length-1){ctRevIdx++;ctRevRender();}
+  else ctExitReview();
+}
+function ctExitReview(){
+  document.getElementById('ct-review-wrap').classList.remove('open');
+  document.getElementById('ct-result-wrap').classList.add('open');
+}
+
+
+// ── Also fix all CT builder pill clicks (step 1,2,3,4) for mobile
+// Make sure all pill clicks use touch events too
+document.addEventListener('DOMContentLoaded', function(){
+  document.body.addEventListener('touchstart', function(){}, {passive:true});
+});
+
+
+</script>
+</body>
+</html>
